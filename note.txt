@@ -1,0 +1,85 @@
+updates
+
+17-7-2023 - updates from shameer
+
+Meal to Recipe
+
+RECIPE : model changes
+Recipe name:
+Description 
+Image
+enable
+Disable
+
+VARIANT group no need
+keep variant only
+
+VARIANT model 
+enable
+Disable
+Meal time category
+Cushion cat 
+Protein cat
+Recipe tag 
+Price 
+Offer price
+Variant name
+Recipe reference
+Preperation time
+
+  calories: {
+      type: String,
+      default: 0,
+    },
+    protein: {
+      type: String,
+      default: 0,
+    },
+    satFat: {
+      type: String,
+      default: 0,
+    },
+    unSatFat: {
+      type: String,
+      default: 0,
+    },
+    totalFat: {
+      type: String,
+      default: 0,
+    },
+    cholesterol: {
+      type: String,
+      default: 0,
+    },
+    fiber: {
+      type: String,
+      default: 0,
+    },
+    carbohydrate: {
+      type: String,
+      default: 0,
+    },
+    sugars: {
+      type: String,
+      default: 0,
+    },
+    iron: {
+      type: String,
+      default: 0,
+    },
+    calcium: {
+      type: String,
+      default: 0,
+    },
+    cho: {
+      type: String,
+      default: 0,
+    },
+    fat: {
+      type: String,
+      default: 0,
+    },
+
+
+
+FOOD MENU ITEM : model edits

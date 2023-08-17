@@ -1,0 +1,345 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+// Table follows {
+//   following_user_id integer
+//   followed_user_id integer
+//   created_at timestamp 
+// }
+
+// Table users {
+//   id integer [primary key]
+//   username varchar
+//   role varchar
+//   created_at timestamp
+// }
+
+// Table posts {
+//   id integer [primary key]
+//   title varchar
+//   body text [note: 'Content of the post']
+//   user_id integer
+//   status varchar
+//   created_at timestamp
+// }
+
+// Table shops {
+//   id integer [primary key]
+//   title varchar
+//   body text [note: 'Content of the post']
+//   user_id integer
+//   status varchar
+//   created_at timestamp
+// }
+
+table userType {
+  _id objectId [note: "PRIMARY KEY"]
+  role string
+  roleDisplayName string
+}
+
+table user {
+  _id objectId [note: "PRIMARY KEY"]
+  userDisplayName string
+  username integer
+  password string [note: "password"]
+  email string [note: "email"]
+  authType string
+  authKey string
+  userType integer [note: "FOREIGN KEY to userType._id"]
+  userImage binary [note: "Size validation <200 kb - Optimize image using sharp"]
+  franchise objectId
+  delete boolean
+  deletedBy objectId [note: "FOREIGN KEY to user._id, reference the user"]
+  deleteDate date
+}
+
+table userToken {
+  _id objectId [note: "PRIMARY KEY"]
+  user objectId [note: "FOREIGN KEY to user._id"]
+}
+
+table module {
+  _id objectId [note: "PRIMARY KEY"]
+  moduleName string
+}
+
+table privilege {
+  _id objectId [note: "PRIMARY KEY"]
+  privilegeType string
+}
+
+table userPrivileges {
+  _id objectId [note: "PRIMARY KEY"]
+  user objectId [note: "FOREIGN KEY to user._id"]
+  modules objectId [note: "FOREIGN KEY to module._id"]
+  privileges objectId [note: "FOREIGN KEY to privilege._id"]
+}
+
+table userSetting {
+  _id objectId
+  darkMode boolean [note: "Light based on user system"]
+  notification boolean
+  usertatus boolean
+  user objectId [note: "FOREIGN KEY to user._id"]
+}
+
+table adminLog {
+  _id objectId
+  referenceTable string
+  actionType string [note: "Edit or Delete"]
+  objectId string
+  user objectId [note: "FOREIGN KEY to user._id"]
+}
+
+table franchise {
+  _id objectId
+  name string
+  location string
+  website string
+  email string
+  phone string
+  description string
+  products array
+  orders array
+  owner string
+}
+
+
+Ref: userType._id > user.userType 
+Ref: franchise._id > user.franchise
+
+table subscriberProfile {
+_id objectId
+subscriberGender boolean [note: "required"]
+subscriberFathername string [note: "required"]
+subscriberMothername string [note: "Optional"]
+dateOfBirth date [note: "required"]
+placeOfBirth string [note: "Optional"]
+mobileNumber integer [note: "required"]
+emailId string [note: "required"]
+address string [note: "required"]
+landmark string [note: "Optional"]
+occupation string [note: "required"]
+officeNumber integer [note: "Optional"]
+officeAddress string [note: "Optional"]
+maritalStatus boolean [note: "Optional"]
+numberOfChildren integer [note: "Optional"]
+height decimal [note: "Optional"]
+presentWeight decimal [note: "Optional"]
+targetWeight decimal [note: "Optional"]
+bmi decimal [note: "required"] 
+aimOfProgram objectId [ref: > aimOfProgram._id]
+medicalCondition objectId [ref: > medicalCondition._id, note: "Optional"]
+foodLikeList objectId  [ref: > foodLikeList._id, note: "Optional"]
+foodDislikeList objectId [ref: > foodDislikeList._id, note: "Optional"]
+addictionList objectId [ref: > addictionList._id, note: "Optional"]
+user objectId [ref: > user._id, note: "required"]
+delete boolean [note: "Optional"]
+deletedBy objectId [ref: > user._id, note: "Optional"]
+deleteDate date [note: "Optional"]
+}
+
+table aimOfProgram {
+_id objectId [note: "PRIMARY KEY"]
+aimOfProgramName string [note: "required"]
+}
+
+table medicalCondition {
+_id objectId [note: "PRIMARY KEY"]
+medicalConditionsName string [note: "required"]
+}
+
+table foodLikeList {
+_id objectId [note: "PRIMARY KEY"]
+foodLikeListName string [note: "required"]
+}
+
+table foodDislikeList {
+_id objectId [note: "PRIMARY KEY"]
+foodDislikeListName string [note: "required"]
+}
+
+table addictionList {
+_id objectId [note: "PRIMARY KEY"]
+addictionListName string [note: "required"]
+}
+
+table subscriberMealPlanEntrie {
+_id objectId [note: "PRIMARY KEY"]
+weeklyMealPlanId objectId [note: "required"]
+dayOfWeekId objectId [note: "required"]
+mealTimeCategories objectId [note: "required"]
+meals objectId [note: "required"]
+subscriberProfile objectId [ref: > subscriberProfile._id, note: "required"]
+prescriptionDetails objectId [note: "required"]
+}
+
+// MEAL CREATION //
+
+table proteinCategory {
+_id objectId [note: "PRIMARY KEY"]
+proteinCategoriesName string [note: "required"]
+}
+
+table cuisineCategory {
+_id objectId [note: "PRIMARY KEY"]
+cuisineCategoriesName string [note: "required"]
+}
+
+table mealTimeCategory {
+_id objectId [note: "PRIMARY KEY"]
+mealTimeCategoriesName string [note: "required"]
+}
+
+table mealTag {
+_id objectId [note: "PRIMARY KEY"]
+mealTag string [note: "required"]
+}
+
+table meal {
+_id objectId [note: "PRIMARY KEY"]
+mealName string [note: "required"]
+mealDescription integer [note: "required"]
+mealPhoto binary [note: "required"]
+mealPreparationTime decimal [note: "required"]
+proteinCategory objectId [ref: > proteinCategory._id, note: "required"]
+cuisineCategory objectId [ref: > cuisineCategory._id, note: "required"]
+mealTimeCategory objectId [ref: > mealTimeCategory._id, note: "required"]
+mealTag objectId [ref: > mealTag._id, note: "optional"]
+user objectId [ref: > user._id, note: "required"]
+delete boolean [note: "optional"]
+deltedBy objectId [ref: > user._id, note: "optional"]
+deleteDate date [note: "optional"]
+}
+
+table mealVariant {
+_id integer [note: "PRIMARY KEY"]
+variantGroup objectId [ref: > variantGroup._id, note: "required"]
+variantLevel objectId [ref: > variantLevel._id, note: "required"]
+mealPrice decimal [note: "required"]
+mealOfferPrice decimal [note: "optional"]
+meal objectId [ref: > meal._id, note: "required"]
+numberOfPersons integer [note: "required"]
+}
+
+table variantGroup {
+_id integer [note: "PRIMARY KEY"]
+name string [note: "required"]
+}
+
+table variantLevel {
+_id integer [note: "PRIMARY KEY"]
+name string [note: "required"]
+variantGroup objectId [ref: > variantGroup._id, note: "required"]
+}
+
+table nutritionalInfo {
+_id objectId [note: "PRIMARY KEY"]
+calories decimal [note: "required"]
+protein decimal [note: "required"]
+satFat decimal [note: "required"]
+unSatFat decimal [note: "optional"]
+cholesterol decimal [note: "optional"]
+fiber decimal [note: "required"]
+carbohydrate decimal [note: "required"]
+sugars decimal [note: "optional"]
+vitamin decimal [note: "optional"]
+meal objectId [ref: > meal._id, note: "required"]
+user objectId [ref: > user._id, note: "required"]
+delete boolean [note: "optional"]
+deltedBy objectId [ref: > user._id, note: "optional"]
+deleteDate date [note: "optional"]
+}
+
+table ingredient {
+_id objectId [note: "PRIMARY KEY"]
+ingredientsName string [note: "required"]
+}
+
+table mealIngredients {
+_id objectId [note: "PRIMARY KEY"]
+ingredient objectId [ref: > ingredient._id, note: "required"]
+ingredientsQuantity integer [note: "required"]
+meal objectId [ref: > meal._id, note: "required"]
+user objectId [ref: > user._id, note: "required"]
+delete boolean [note: "optional"]
+deltedBy objectId [ref: > user._id, note: "optional"]
+deleteDate date [note: "optional"]
+}
+
+// WEEKLY MEAL PLANER //
+
+table weeklyMealPlan {
+_id objectId [note: "PRIMARY KEY"]
+weekStartDate date [note: "required"]
+weekEndDate date [note: "required"]
+user objectId [ref: > user._id, note: "required"]
+delete boolean [note: "optional"]
+deltedBy objectId [ref: > user._id, note: "optional"]
+deleteDate date [note: "optional"]
+}
+
+table dayOfWeek {
+_id objectId [note: "PRIMARY KEY"]
+day string [note: "required"]
+}
+
+table mealPlanEntry {
+_id objectId [note: "PRIMARY KEY"]
+weeklyMealPlanId objectId [ref: > weeklyMealPlan._id, note: "required"]
+dayOfWeekId objectId [ref: > dayOfWeek._id, note: "required"]
+mealTimeCategory objectId [ref: > mealTimeCategory._id, note: "required"]
+meal objectId [ref: > meal._id, note: "required"]
+delete boolean [note: "optional"]
+deltedBy objectId [ref: > user._id, note: "optional"]
+deleteDate date [note: "optional"]
+}
+
+// PRESCRIPTION //
+
+table appointment {
+_id objectId [note: "PRIMARY KEY"]
+subscriberProfile objectId [ref: > subscriberProfile._id, note: "required"]
+user objectId [ref: > user._id, note: "required"]
+bookingId String [note: "required"]
+bookingDate date [note: "required"]
+timeSlot objectId [
+  // ref: > timeSlot._id, 
+  note: "required"]
+delete boolean [note: "optional"]
+deltedBy objectId [ref: > user._id, note: "optional"]
+deleteDate date [note: "optional"]
+}
+
+table prescriptionDetail {
+_id objectId [note: "PRIMARY KEY"]
+appointment objectId [ref: > appointment._id, note: "required"]
+user objectId [ref: > user._id, note: "required"]
+subscriberMealPlanEntry objectId [
+  // ref: > subscriberMealPlanEntry._id, 
+  note: "required"]
+delete boolean [note: "optional"]
+deltedBy objectId [ref: > user._id, note: "optional"]
+deleteDate date [note: "optional"]
+}
+
+
+
+
+
+
+
+
+// Ref: posts.user_id > users.id // many-to-one
+
+// Ref: users.id < follows.following_user_id
+
+// Ref: users.id < follows.followed_user_id
+
+
+// Ref: users.username < users.created_at
+
+// Ref: "users"."username" < "users"."role"
+
+// Ref: "posts"."body" < "shops"."body"
