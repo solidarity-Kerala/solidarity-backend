@@ -1,58 +1,53 @@
 const { default: mongoose } = require("mongoose");
-const Blog = require("../models/Blog");
+const Notification = require("../models/Notification");
 
-// @desc      CREATE NEW BLOG
-// @route     POST /api/v1/blog
-// @access    protect
-exports.createBlog = async (req, res) => {
+// @desc      CREATE NOTIFICATION
+// @route     POST /api/v1/notification
+// @access    private
+exports.createNotification = async (req, res) => {
     try {
-        const newBlog = await Blog.create(req.body);
+        const response = await Notification.create(req.body);
         res.status(200).json({
             success: true,
-            message: "Blog created successfully",
-            data: newBlog,
+            message: "Successfully added notification",
+            response,
         });
     } catch (err) {
         console.log(err);
         res.status(400).json({
             success: false,
-            message: err,
+            message: err.toString(),
         });
     }
 };
 
-// @desc      GET ALL BLOG
-// @route     GET /api/v1/blog
-// @access    public
-exports.getBlog = async (req, res) => {
+// @desc      GET NOTIFICATION
+// @route     GET /api/v1/notification
+// @access    private
+exports.getNotification = async (req, res) => {
     try {
         const { id, skip, limit, searchkey } = req.query;
-
         if (id && mongoose.isValidObjectId(id)) {
-            const response = await Blog.findById(id);
+            const response = await Notification.findById(id);
             return res.status(200).json({
                 success: true,
-                message: "Retrieved specific blog",
+                message: `Retrieved specific notification`,
                 response,
             });
         }
-
         const query = searchkey
             ? { ...req.filter, title: { $regex: searchkey, $options: "i" } }
             : req.filter;
-
         const [totalCount, filterCount, data] = await Promise.all([
-            parseInt(skip) === 0 && Blog.countDocuments(),
-            parseInt(skip) === 0 && Blog.countDocuments(query),
-            Blog.find(query)
+            parseInt(skip) === 0 && Notification.countDocuments(),
+            parseInt(skip) === 0 && Notification.countDocuments(query),
+            Notification.find(query)
                 .skip(parseInt(skip) || 0)
-                .limit(parseInt(limit) || 50)
-                .sort({ _id: -1 }),
+                .limit(parseInt(limit) || 50),
         ]);
-
         res.status(200).json({
             success: true,
-            message: `Retrieved all blog`,
+            message: `Retrieved all notification`,
             response: data,
             count: data.length,
             totalCount: totalCount || 0,
@@ -67,53 +62,43 @@ exports.getBlog = async (req, res) => {
     }
 };
 
-// @desc      UPDATE SPECIFIC BLOG
-// @route     PUT /api/v1/blog/:id
-// @access    protect
-exports.updateBlog = async (req, res) => {
+// @desc      UPDATE NOTIFICATION
+// @route     PUT /api/v1/notification
+// @access    private
+exports.updateNotification = async (req, res) => {
     try {
-        const blogs = await Blog.findByIdAndUpdate(req.body.id, req.body, {
+        const response = await Notification.findByIdAndUpdate(req.body.id, req.body, {
             new: true,
         });
-
-        if (!blogs) {
-            return res.status(404).json({
-                success: false,
-                message: "Blog not found",
-            });
-        }
-
         res.status(200).json({
             success: true,
-            message: "Blog updated successfully",
-            data: blogs,
+            message: "Updated specific notification",
+            enrollment: response,
         });
     } catch (err) {
         console.log(err);
         res.status(400).json({
             success: false,
-            message: err,
+            message: err.toString(),
         });
     }
 };
 
-// @desc      DELETE SPECIFIC BLOG
-// @route     DELETE /api/v1/blog/:id
-// @access    protect
-exports.deleteBlog = async (req, res) => {
+// @desc      DELETE NOTIFICATION
+// @route     DELETE /api/v1/notification
+// @access    private
+exports.deleteNotification = async (req, res) => {
     try {
-        const blogs = await Blog.findByIdAndDelete(req.query.id);
-
-        if (!blogs) {
+        const notification = await Notification.findByIdAndDelete(req.query.id);
+        if (!notification) {
             return res.status(404).json({
                 success: false,
-                message: "Blog not found",
+                message: "Notification not found",
             });
         }
-
         res.status(200).json({
             success: true,
-            message: "Blog deleted successfully",
+            message: "Notification deleted successfully",
         });
     } catch (err) {
         console.log(err);

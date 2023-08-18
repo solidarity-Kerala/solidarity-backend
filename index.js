@@ -72,6 +72,8 @@ const bithulmal = require("./routes/bithulmal.js");
 const associates = require("./routes/associates.js");
 const product = require("./routes/product.js");
 const productDetails = require("./routes/productDetails.js");
+const notifications = require("./routes/notification.js");
+
 // mount routers
 app.use("/api/V1/auth", auth);
 app.use("/api/v1/user", user);
@@ -105,5 +107,7 @@ app.use("/api/v1/bithulmal", bithulmal);
 app.use("/api/v1/associates", associates);
 app.use("/api/v1/product", product);
 app.use("/api/v1/product-details", productDetails);
+app.use("/api/v1/notification", notifications);
+
 const PORT = process.env.PORT || 8030;
 app.listen(PORT, console.log(`port is running ${PORT}`));

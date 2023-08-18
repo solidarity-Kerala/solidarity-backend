@@ -1,15 +1,15 @@
 const mongoose = require("mongoose");
 
-const GallerySchema = new mongoose.Schema(
+const NotificationSchema = new mongoose.Schema(
     {
         title: {
             type: String,
         },
-        image: {
+        link: {
             type: String,
         },
     },
     { timestamps: true }
 );
 
-module.exports = mongoose.model("Gallery", GallerySchema);
+module.exports = mongoose.model("Notification", NotificationSchema);

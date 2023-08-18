@@ -2,3 +2,6 @@
 /uploads/*
 /config/.env
 .env
+package-lock.json
+yarn.lock
+.DS_Store

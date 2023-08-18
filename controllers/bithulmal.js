@@ -185,87 +185,28 @@ exports.getBithulmalReport = async (req, res) => {
 
 exports.getBithulmalReportByMemberGroup = async (req, res) => {
   try {
-    const { searchkey } = req.query;
+    const { searchkey, month } = req.query;
 
     const response = await Bithulmal.find({
       groupId: req.query.groupId,
-    }).populate("memberId");
-    console.log({ response });
+      month: req.query.month,
+    }).populate({
+      path: 'memberId',
+      select: 'name'
+    });
 
-    // const aggr = await Bithulmal.aggregate([
-    //   { $match: { groupId: req.query.groupId } }, // Match by groupId
-    //   {
-    //     $group: {
-    //       _id: "$memberId",
-    //       memberId: { $first: "$memberId" },
-    //       amount: { $sum: { $toInt: "$amountPaid" } },
-    //     },
-    //   },
-    // ]);
-
-    // console.log({ aggr });
-
-    // Map the response to get the amount paid for each member
-    // const memberAmounts = aggr.map((item) => ({
-    //   memberId: item.memberId,
-    //   amountPaid: item.amount,
-    // }));
-
-    // console.log({ memberAmounts });
-
-    // Define and set the query based on the searchkey parameter if provided
-    // const query = searchkey
-    //   ? { groupId: { $regex: searchkey, $options: "i" } }
-    //   : {};
-
-    // // Calculate total amount for each member group
-    // const groupAmounts = await Bithulmal.aggregate([
-    //   { $match: query },
-    //   {
-    //     $group: {
-    //       _id: "$groupId",
-    //       memberId: { $first: "$memberId" },
-    //       amount: { $sum: "$amountPaid" },
-    //     },
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "membersgroups", // Replace with the actual name of the member group collection
-    //       localField: "_id",
-    //       foreignField: "_id",
-    //       as: "groupInfo",
-    //     },
-    //   },
-    //   {
-    //     $unwind: "$groupInfo",
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "members", // Replace with the actual name of the member collection
-    //       localField: "_id",
-    //       foreignField: "groupInfo.memberId",
-    //       as: "membersInfo",
-    //     },
-    //   },
-    //   // {
-    //   //   $project: {
-    //   //     _id: 0,
-    //   //     groupId: "$_id",
-    //   //     groupName: "$groupInfo.groupName",
-    //   //     name: "$groupInfo.name",
-    //   //     amount: 1,
-    //   //     members: "$membersInfo",
-    //   //   },
-    //   // },
-    // ]);
+    const simplifiedResponse = response.map(entry => {
+      return {
+        amount: entry.amount,
+        amountPaid: entry.amountPaid,
+        memberName: entry.memberId.name
+      };
+    });
 
     res.status(200).json({
       success: true,
       message: `Retrieved Bithulmal report`,
-      // response: groupAmounts,
-      // count: groupAmounts.length,
-      // aggr,
-      response,
+      simplifiedResponse,
     });
   } catch (err) {
     console.log(err);
@@ -371,6 +312,41 @@ exports.getAmountPaidByMemberInMemberGroup = async (req, res) => {
     });
   } catch (err) {
     console.log("Error:", err);
+    res.status(400).json({
+      success: false,
+      message: err.toString(),
+    });
+  }
+};
+
+exports.sumBithumalAmount = async (req, res) => {
+  console.log(req.query)
+  try {
+    const { searchkey, month } = req.query;
+
+    const aggregationPipeline = [
+      {
+        $match: {
+          groupId: req.query.groupId,
+          // month: req.query.month,
+        }
+      },
+    ];
+
+    const bithulmalEntries = await Bithulmal.find({ groupId: req.query.groupId, month: req.query.month })
+    let totalAmountPaid = 0;
+
+    for (const entry of bithulmalEntries) {
+      totalAmountPaid += parseFloat(entry.amountPaid);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Total Bithulmal amount for the specified criteria`,
+      totalAmountPaid: totalAmountPaid.toFixed(2),
+    });
+  } catch (err) {
+    console.log(err);
     res.status(400).json({
       success: false,
       message: err.toString(),
