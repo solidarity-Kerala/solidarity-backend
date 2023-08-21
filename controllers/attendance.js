@@ -348,3 +348,75 @@ exports.getPresentAbsentMembersByMonth = async (req, res) => {
     });
   }
 };
+exports.getPresentAbsentMembersByMonthwithcount = async (req, res) => {
+  try {
+    const { groupId, startMonth, endMonth } = req.query;
+    // Convert the startMonth and endMonth strings to JavaScript Date objects
+    const startDate = new Date(startMonth);
+    const endDate = new Date(endMonth);
+    // Ensure that the endDate is greater than or equal to the startDate
+    if (startDate > endDate) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid date range. The end date should be greater than or equal to the start date.",
+      });
+    }
+    // Define the query based on the provided parameters
+    const query = {
+      groupId: new mongoose.Types.ObjectId(groupId), // Use new with mongoose.Types.ObjectId
+      date: { $gte: startDate, $lte: endDate },
+    };
+    // Calculate total present and absent for each member within the specified group and month range
+    const memberGroupMonthAttendances = await Attendance.aggregate([
+      { $match: query },
+      {
+        $group: {
+          _id: {
+            memberId: "$memberId",
+            groupId: "$groupId",
+          },
+          totalPresent: {
+            $sum: { $cond: [{ $eq: ["$status", "Present"] }, 1, 0] },
+          },
+          totalAbsent: {
+            $sum: { $cond: [{ $eq: ["$status", "Absent"] }, 1, 0] },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "members", // Replace with the actual name of the member collection
+          localField: "_id.memberId",
+          foreignField: "_id",
+          as: "memberInfo",
+        },
+      },
+      {
+        $unwind: "$memberInfo",
+      },
+      {
+        $project: {
+          _id: 0,
+          memberId: "$_id.memberId",
+          memberName: "$memberInfo.name",
+          groupName: "$_id.groupId",
+          totalPresent: 1,
+          totalAbsent: 1,
+        },
+      },
+    ]);
+    res.status(200).json({
+      success: true,
+      message:
+        "Retrieved present and absent count of each member by group and month",
+      response: memberGroupMonthAttendances,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({
+      success: false,
+      message: err.toString(),
+    });
+  }
+};
