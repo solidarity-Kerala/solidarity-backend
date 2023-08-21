@@ -26,5 +26,9 @@ router.get("/report/member-group", getAttendanceReportByMemberGroup);
 router.get("/report/month", getAttendanceReportByMonth);
 router.get("/attendance-by-member", getAttendanceByMember);
 router.get("/present-absent-members", getPresentAbsentMembersByMonth);
+router.get(
+  "/present-absent-members-count",
+  getPresentAbsentMembersByMonthwithcount
+);
 
 module.exports = router;
