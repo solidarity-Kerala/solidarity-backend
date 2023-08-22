@@ -6,7 +6,7 @@ const {
   updateMemberStatus,
   deleteMemberStatus,
   select,
-} = require("../controllers/memberstatus");
+} = require("../controllers/memberStatus");
 // middleware
 const { protect, authorize } = require("../middleware/auth");
 const { reqFilter } = require("../middleware/filter");

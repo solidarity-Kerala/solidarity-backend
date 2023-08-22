@@ -6,7 +6,7 @@ const {
   updateMembersGroup,
   deleteMembersGroup,
   select,
-} = require("../controllers/membersgroup");
+} = require("../controllers/membersGroup");
 // middleware
 const { protect, authorize } = require("../middleware/auth");
 const { reqFilter } = require("../middleware/filter");
