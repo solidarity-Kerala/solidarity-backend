@@ -10,6 +10,7 @@ const {
   getAttendanceReportByMonth,
   getAttendanceByMember,
   getPresentAbsentMembersByMonth,
+  getPresentAbsentMembersByMonthwithcount,
 } = require("../controllers/attendance");
 // middleware
 const { protect } = require("../middleware/auth");
