@@ -108,7 +108,7 @@ app.use("/api/v1/associates", associates);
 app.use("/api/v1/product", product);
 app.use("/api/v1/product-details", productDetails);
 app.use("/api/v1/notification", notifications);
-app.use("/api/v1/present-absent-members-count",presentAbsentMembersByMonthwithcount):
+// app.use("/api/v1/present-absent-members-count",presentAbsentMembersByMonthwithcount):
 
 const PORT = process.env.PORT || 8030;
 app.listen(PORT, console.log(`port is running ${PORT}`));
