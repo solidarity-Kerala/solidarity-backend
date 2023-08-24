@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const Gallery = require("../models/Gallery");
+const Gallery = require("../models/gallery");
 
 // @desc      CREATE NEW GALLERY
 // @route     POST /api/v1/gallery

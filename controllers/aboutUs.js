@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const AboutUs = require("../models/AboutUs");
+const AboutUs = require("../models/aboutUs");
 
 // @desc      CREATE ABOUTUS
 // @route     POST /api/v1/about-us
@@ -36,9 +36,7 @@ exports.getAboutUs = async (req, res) => {
         response,
       });
     }
-    // const query = searchkey
-    //   ? { ...req.filter, title: { $regex: searchkey, $options: "i" } }
-    //   : req.filter;
+
     const query = {
       ...req.filter,
       ...(searchkey && {

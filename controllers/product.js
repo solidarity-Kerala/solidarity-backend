@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const Product = require("../models/Product");
+const Product = require("../models/product");
 
 // @desc      CREATE NEW PRODUCT
 // @route     POST /api/v1/product

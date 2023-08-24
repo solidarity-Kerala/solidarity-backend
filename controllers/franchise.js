@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const Franchise = require("../models/Franchise");
+const Franchise = require("../models/franchise");
 
 // @desc      CREATE NEW FRANCHISE
 // @route     POST /api/v1/franchises

@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const MembersStatus = require("../models/Memberstatus");
+const MembersStatus = require("../models/memberstatus");
 
 // @desc      CREATE NEW MEMBER STATUS
 // @route     POST /api/v1/members-status

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const District = require("../models/District");
+const District = require("../models/district");
 
 // @desc      CREATE NEW DISTRICT
 // @route     POST /api/v1/district

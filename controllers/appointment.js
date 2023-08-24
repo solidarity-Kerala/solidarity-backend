@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const Appointment = require("../models/Appointment");
+const Appointment = require("../models/appointment");
 
 // @desc      CREATE NEW APPOINTMENT
 // @route     POST /api/v1/appointments
@@ -65,11 +65,6 @@ exports.getAppointment = async (req, res) => {
     const query = searchkey
       ? { ...req.filter, bookingId: { $regex: searchkey, $options: "i" } }
       : req.filter;
-
-    // const regex = new RegExp(searchkey, "i");
-    // const userMatchesRegex = Object.values(data.user).some((value) =>
-    //   regex.test(value)
-    // );
 
     if (req.user?.userType?.role === "Dietician") {
       query.dietician = req.user._id;
@@ -213,10 +208,6 @@ exports.filterAppointment = async (req, res) => {
     const appointments = await Appointment.find(filters).populate(
       "user dietician"
     );
-    // .populate("user")
-    // .populate("dietician")
-    // .populate("subscriberMealPlanEntry");
-    // .populate("bookingSlot");
 
     if (!appointments.length) {
       return res.status(404).json({
@@ -250,9 +241,7 @@ exports.activeAdmission = async (req, res) => {
     if (id && mongoose.isValidObjectId(id)) {
       const response = await Appointment.findById(id)
         .populate("user")
-        //   .populate("timeSlot")
         .populate("dietician");
-      // .populate("subscriberMealPlanEntry");
       return res.status(200).json({
         success: true,
         message: "Retrieved specific appointment list",
@@ -288,13 +277,11 @@ exports.activeAdmission = async (req, res) => {
     const [totalCount, filterCount, data] = await Promise.all([
       parseInt(skip) === 0 && Appointment.countDocuments(),
       parseInt(skip) === 0 && Appointment.countDocuments(query),
-      // Appointment.find({ ...query })
       Appointment.find(query)
         .sort({ _id: -1 })
         .populate("user")
         .populate("bookingSlot")
         .populate("dietician")
-        // .populate("subscriberMealPlanEntry")
         .skip(parseInt(skip) || 0)
         .limit(parseInt(limit) || 10),
     ]);

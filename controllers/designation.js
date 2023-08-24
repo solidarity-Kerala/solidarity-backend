@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const Designation = require("../models/Designation");
+const Designation = require("../models/designation");
 
 // @desc      CREATE NEW DESIGNATION
 // @route     POST /api/v1/designation

@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
-const Membersgroup = require("../models/Membersgroup");
-const Admin = require('../models/AdminModel')
+const membersGroup = require("../models/membersGroup");
+const Admin = require('../models/adminModel')
 
 // @desc      CREATE NEW ADMIN
 // @route     POST /api/v1/admin
@@ -8,8 +8,8 @@ const Admin = require('../models/AdminModel')
 exports.createAdmin = async (req, res) => {
   console.log(req.body);
   try {
-      const {name, username, password, undefined} = req.body
-      const newAdmin = await Admin.create({ name, username, password, membersGroupId:undefined });
+    const { name, username, password, undefined } = req.body
+    const newAdmin = await Admin.create({ name, username, password, membersGroupId: undefined });
     res.status(200).json({
       success: true,
       message: "Admin created successfully",
@@ -33,9 +33,6 @@ exports.getAdmin = async (req, res) => {
 
     if (id && mongoose.isValidObjectId(id)) {
       const admin = await Admin.findById(id)
-        // .populate("memberStatus")
-        // .populate("designation")
-        // .populate("groupId");
       return res.status(200).json({
         success: true,
         message: "Retrieved specific admin",
@@ -51,9 +48,6 @@ exports.getAdmin = async (req, res) => {
       parseInt(skip) === 0 && Admin.countDocuments(),
       parseInt(skip) === 0 && Admin.countDocuments(query),
       Admin.find(query)
-        // .populate("memberStatus")
-        // .populate("designation")
-        // .populate("groupId")
         .skip(parseInt(skip) || 0)
         .limit(parseInt(limit) || 50)
         .sort({ _id: -1 }),

@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const SubMenu = require("../models/SubMenu");
+const SubMenu = require("../models/subMenu");
 
 //@desc ADD SUB MENU
 //@route POST/api/v1/sub-menu

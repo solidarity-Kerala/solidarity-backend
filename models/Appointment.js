@@ -20,10 +20,6 @@ const AppointmentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    // subscriberMealPlanEntry: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "SubscriberMealPlanEntry",
-    // },
     dischargeDate: {
       type: Date,
       default: null,

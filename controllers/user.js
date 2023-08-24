@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken");
 //
-const User = require("../models/User");
-// const UserSubscriber = require("../models/UserSubscriber");
+const User = require("../models/user");
 const { default: mongoose } = require("mongoose");
 const { query } = require("express");
 
@@ -37,20 +36,11 @@ exports.addUser = async (req, res) => {
       franchise: new mongoose.Types.ObjectId(franchise),
     });
 
-    // Create the userSubscriber
-    const userSubscriber = await UserSubscriber.create({
-      cprNumber,
-      address,
-      gender,
-      user: user._id,
-      dateOfBirth,
-    });
-
     res.status(200).json({
       success: true,
       message: "User Created Successfully",
       user,
-      userSubscriber,
+      // userSubscriber,
     });
   } catch (err) {
     console.log("Error:", err);
@@ -159,11 +149,6 @@ exports.getUser = async (req, res) => {
 // @access    public
 exports.updateUser = async (req, res) => {
   try {
-    // req.body.franchise = new mongoose.Types.ObjectId(req.body.franchise);
-    // const datas = req.body.userType
-    //   ? req.body.userType
-    //   : new mongoose.Types.ObjectId(req.user.userType._id);
-    // req.body.userType = datas;
     const {
       id,
       address,
@@ -188,19 +173,10 @@ exports.updateUser = async (req, res) => {
       { new: true }
     );
 
-    const resp = await UserSubscriber.findOneAndUpdate(
-      { user: id },
-      {
-        address,
-        gender,
-      }
-    );
-
     return res.status(200).json({
       success: true,
       message: `updated specific sub menu`,
       response,
-      resp,
     });
   } catch (err) {
     console.log("Error:", err);

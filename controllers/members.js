@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
-const Members = require("../models/Members");
-const Membersgroup = require("../models/Membersgroup");
+const Members = require("../models/members");
+const Membersgroup = require("../models/membersGroup");
 
 // @desc      CREATE NEW MEMBER
 // @route     POST /api/v1/members

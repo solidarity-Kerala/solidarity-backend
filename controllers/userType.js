@@ -1,4 +1,4 @@
-const UserTypes = require("../models/UserTypes");
+const UserTypes = require("../models/userTypes");
 const { default: mongoose } = require("mongoose");
 
 // @desc      ADD USER TYPE

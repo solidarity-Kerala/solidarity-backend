@@ -1,8 +1,8 @@
-const Admin = require("../models/AdminModel");
-const Members = require("../models/Members");
-const Membersgroup = require("../models/Membersgroup");
-const Menu = require("../models/Menu");
-const User = require("../models/User");
+const Admin = require("../models/adminModel");
+const Members = require("../models/members");
+const Membersgroup = require("../models/membersGroup");
+const Menu = require("../models/menu");
+const User = require("../models/user");
 
 const getMenu = async (role) => {
   const menu = await Menu.aggregate([
@@ -138,7 +138,7 @@ exports.adminLogin = async (req, res) => {
     const admin = await Admin.findOne({ username })
       .populate("membersGroupId") // Populate the membersGroupId field
       .exec();
-      console.log(admin);
+    console.log(admin);
 
     if (!admin) {
       res.status(200).json({
@@ -169,7 +169,7 @@ exports.adminLogin = async (req, res) => {
     });
   }
 };
- 
+
 exports.register = async (req, res) => {
   try {
     const { username, password, email, name } = req.body;

@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
-const MenuRole = require("../models/MenuRole");
-const Menu = require("../models/Menu");
+const MenuRole = require("../models/menuRole");
+const Menu = require("../models/menu");
 
 //@desc ADD MENU ROLE
 //@route POST/api/v1/menu-role

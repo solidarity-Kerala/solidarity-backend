@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const Area = require("../models/Area");
+const Area = require("../models/area");
 
 // @desc      CREATE NEW AREA
 // @route     POST /api/v1/area

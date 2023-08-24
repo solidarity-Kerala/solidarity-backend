@@ -6,22 +6,15 @@ const UserSchema = new mongoose.Schema(
   {
     cprNumber: {
       type: String,
-      // unique: true,
-      // required: true,
     },
     userDisplayName: {
       type: String,
-      // required: true,
     },
     username: {
       type: String,
-      // unique: true,
-      // required: true,
     },
     email: {
       type: String,
-      // unique: true,
-      // required: true,
       match: [
         /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
         "Please add a valid email",

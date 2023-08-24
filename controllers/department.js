@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const Department = require("../models/Department");
+const Department = require("../models/department");
 
 // @desc      CREATE NEW DEPARTMENT
 // @route     POST /api/v1/department

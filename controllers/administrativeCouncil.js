@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const AdministrativeCouncil = require("../models/AdministrativeCouncil");
+const AdministrativeCouncil = require("../models/administrativeCouncil");
 
 // @desc      CREATE NEW ADMINISTRATIVE COUNCIL
 // @route     POST /api/v1/administrative-council
@@ -46,7 +46,6 @@ exports.getAdministrativeCouncil = async (req, res) => {
             parseInt(skip) === 0 && AdministrativeCouncil.countDocuments(),
             parseInt(skip) === 0 && AdministrativeCouncil.countDocuments(query),
             AdministrativeCouncil.find(query)
-                // .populate("franchise")
                 .skip(parseInt(skip) || 0)
                 .limit(parseInt(limit) || 50),
         ]);
@@ -115,24 +114,3 @@ exports.deleteAdministrativeCouncil = async (req, res) => {
         });
     }
 };
-
-// @desc      GET BY FRANCHISE
-// @route     GET /api/v1/boardof-director/get-by-boardof-director
-// @access    private
-// exports.getByFranchise = async (req, res) => {
-//     try {
-//         const { id } = req.query;
-//         const response = await BoardOfDirector.find({ franchise: id });
-
-//         res.status(201).json({
-//             message: "Successfully retrieved",
-//             data: response,
-//         });
-//     } catch (err) {
-//         console.log("Error:", err);
-//         res.status(500).json({
-//             error: "Internal server error",
-//             success: false,
-//         });
-//     }
-// };

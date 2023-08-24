@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const Notification = require("../models/Notification");
+const Notification = require("../models/notification");
 
 // @desc      CREATE NOTIFICATION
 // @route     POST /api/v1/notification

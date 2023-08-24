@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
-const Bithulmal = require("../models/Bithulmal");
-const Membergroup = require("../models/Membersgroup");
+const Bithulmal = require("../models/bithulmal");
+const Membergroup = require("../models/membersGroup");
 
 // @desc      CREATE NEW BITHULMAL
 // @route     POST /api/v1/bithulmals
@@ -219,59 +219,6 @@ exports.getBithulmalReportByMemberGroup = async (req, res) => {
 
 exports.getAmountPaidByMemberInMemberGroup = async (req, res) => {
   try {
-    // const { groupId } = req.query;
-    // console.log("Finding member group...", req.query);
-
-    // const group = await Membergroup.findById(groupId);
-    // console.log("Finding member group...", group);
-    // if (!groupId) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "Missing groupId parameter.",
-    //   });
-    // }
-
-    // if (!group) {
-    //   console.log("Member group not found.");
-    //   return res.status(404).json({
-    //     success: false,
-    //     message: "Member group not found.",
-    //   });
-    // }
-
-    // console.log("Calculating member amounts...");
-    // const memberAmounts = await Bithulmal.aggregate([
-    //   { $match: { groupId: groupId } },
-    //   {
-    //     $group: {
-    //       _id: "$memberId",
-    //       memberId: { $first: "$memberId" },
-    //       amountPaid: { $sum: "$amountPaid" },
-    //     },
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "members", // Replace with the actual name of the member collection
-    //       localField: "_id",
-    //       foreignField: "_id",
-    //       as: "memberInfo",
-    //     },
-    //   },
-    //   {
-    //     $unwind: "$memberInfo",
-    //   },
-    //   {
-    //     $project: {
-    //       _id: 0,
-    //       memberId: "$_id",
-    //       memberName: "$memberInfo.name",
-    //       amountPaid: 1,
-    //     },
-    //   },
-    // ]);
-
-    // const response = await Bithulmal.find({ groupId: req.query.groupId });
-
     const memberAmounts = await Bithulmal.aggregate([
       { $match: { groupId: new mongoose.Types.ObjectId(req.query.groupId) } },
       {
@@ -306,8 +253,6 @@ exports.getAmountPaidByMemberInMemberGroup = async (req, res) => {
     res.status(200).json({
       success: true,
       message: `Retrieved amount paid by each member in the group.`,
-      // response: memberAmounts,
-      // count: memberAmounts.length,
       memberAmounts,
     });
   } catch (err) {

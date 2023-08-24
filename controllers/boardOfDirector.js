@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const BoardOfDirector = require("../models/BoardOfDirector");
+const BoardOfDirector = require("../models/boardOfDirector");
 
 // @desc      CREATE NEW BOARD OF DIRECTOR
 // @route     POST /api/v1/boardof-director

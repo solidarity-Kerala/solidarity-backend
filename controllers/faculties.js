@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const Faculties = require("../models/Faculties");
+const Faculties = require("../models/faculties");
 
 // @desc      CREATE NEW FACULTIES
 // @route     POST /api/v1/faculties
@@ -115,24 +115,3 @@ exports.deleteFaculties = async (req, res) => {
         });
     }
 };
-
-// @desc      GET BY FRANCHISE
-// @route     GET /api/v1/boardof-director/get-by-boardof-director
-// @access    private
-// exports.getByFranchise = async (req, res) => {
-//     try {
-//         const { id } = req.query;
-//         const response = await BoardOfDirector.find({ franchise: id });
-
-//         res.status(201).json({
-//             message: "Successfully retrieved",
-//             data: response,
-//         });
-//     } catch (err) {
-//         console.log("Error:", err);
-//         res.status(500).json({
-//             error: "Internal server error",
-//             success: false,
-//         });
-//     }
-// };

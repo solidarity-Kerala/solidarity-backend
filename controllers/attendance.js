@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const Attendance = require("../models/Attendance");
+const Attendance = require("../models/attendance");
 
 // @desc      CREATE NEW ATTENDANCE
 // @route     POST /api/v1/attendance
