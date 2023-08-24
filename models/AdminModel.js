@@ -19,10 +19,10 @@ const adminSchema = new mongoose.Schema(
       required: true,
     },
     membersGroupId: {
-        type: mongoose.Schema.Types.ObjectId,
-        default: null,
-        ref: "Membersgroup",
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      default: null,
+      ref: "Membersgroup",
+    },
   },
   { timestamps: true }
 );
