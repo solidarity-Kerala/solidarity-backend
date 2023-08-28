@@ -10,7 +10,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://solidarity-cms-backend-5v29n.ondigitalocean.app",
+  "https://gentle-forest-0ff497700.3.azurestaticapps.net",
 ];
 
 //cors policy
