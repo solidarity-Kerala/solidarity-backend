@@ -10,7 +10,6 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://zealous-hill-058fc7310.3.azurestaticapps.net",
   "https://solidarity-cms-backend-5v29n.ondigitalocean.app",
 ];
 
