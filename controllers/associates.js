@@ -6,8 +6,12 @@ const Membersgroup = require("../models/membersGroup");
 // @route     POST /api/v1/associates
 // @access    protect
 exports.createAssociates = async (req, res) => {
+  console.log(req.body);
   try {
-    const newAssociates = await Associates.create(req.body);
+    const newAssociates = await Associates.create({
+      ...req.body,
+      userType: "Associates",
+    });
     res.status(200).json({
       success: true,
       message: "Associates created successfully",
@@ -26,14 +30,15 @@ exports.createAssociates = async (req, res) => {
 // @route     GET /api/v1/associates
 // @access    public
 exports.getAssociates = async (req, res) => {
+  console.log(req.query);
   try {
     const { id, skip, limit, searchkey } = req.query;
 
     if (id && mongoose.isValidObjectId(id)) {
       const associate = await Associates.findById(id)
-        .populate("memberStatus")
+        // .populate("memberStatus")
         .populate("designation")
-        .populate("groupId");
+        .populate("group");
       return res.status(200).json({
         success: true,
         message: "Retrieved specific associates",
@@ -49,9 +54,9 @@ exports.getAssociates = async (req, res) => {
       parseInt(skip) === 0 && Associates.countDocuments(),
       parseInt(skip) === 0 && Associates.countDocuments(query),
       Associates.find(query)
-        .populate("memberStatus")
+        // .populate("memberStatus")
         .populate("designation")
-        .populate("groupId")
+        .populate("group")
         .skip(parseInt(skip) || 0)
         .limit(parseInt(limit) || 50)
         .sort({ _id: -1 }),

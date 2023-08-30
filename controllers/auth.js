@@ -133,10 +133,11 @@ exports.login = async (req, res) => {
 // @route     POST /api/v1/auth/admin-login
 // @access    Public
 exports.adminLogin = async (req, res) => {
+  console.log(req.body);
   const { username } = req.body;
   try {
     const admin = await Admin.findOne({ username })
-      .populate("membersGroupId") // Populate the membersGroupId field
+      .populate("group") // Populate the membersGroupId field
       .exec();
     console.log(admin);
 
@@ -156,7 +157,9 @@ exports.adminLogin = async (req, res) => {
           success: true,
           message: "Admin logged in successfully.",
           adminId: admin._id,
-          membersGroupId: admin.membersGroupId ? admin.membersGroupId._id : null,
+          membersGroupId: admin.membersGroupId
+            ? admin.membersGroupId._id
+            : null,
           admin,
         });
       }

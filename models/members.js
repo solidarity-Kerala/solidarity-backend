@@ -38,7 +38,7 @@ const membersSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    type: {
+    userType: {
       type: String,
       enum: ["Member"],
       required: true,
@@ -46,9 +46,14 @@ const membersSchema = new mongoose.Schema(
     dob: {
       type: String,
     },
+    // memberStatus: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "MemberStatus",
+    //   required: true,
+    // },
     memberStatus: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "MemberStatus",
+      type: Boolean,
+      // ref: "MemberStatus",
       required: true,
     },
     designation: {
@@ -56,7 +61,7 @@ const membersSchema = new mongoose.Schema(
       ref: "Designation",
       required: true,
     },
-    groupId: {
+    group: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Membersgroup",
       required: true,

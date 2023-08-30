@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const membersGroup = require("../models/membersGroup");
-const Admin = require('../models/adminModel');
+const Admin = require("../models/adminModel");
 
 // @desc      CREATE NEW ADMIN
 // @route     POST /api/v1/admin
@@ -8,8 +8,8 @@ const Admin = require('../models/adminModel');
 exports.createAdmin = async (req, res) => {
   console.log(req.body);
   try {
-    const { name, username, password, undefined } = req.body
-    const newAdmin = await Admin.create({ name, username, password, membersGroupId: undefined });
+    const { name, username, password, undefined } = req.body;
+    const newAdmin = await Admin.create(req.body);
     res.status(200).json({
       success: true,
       message: "Admin created successfully",
@@ -32,7 +32,7 @@ exports.getAdmin = async (req, res) => {
     const { id, skip, limit, searchkey } = req.query;
 
     if (id && mongoose.isValidObjectId(id)) {
-      const admin = await Admin.findById(id)
+      const admin = await Admin.findById(id);
       return res.status(200).json({
         success: true,
         message: "Retrieved specific admin",
@@ -132,10 +132,7 @@ exports.deleteAdmin = async (req, res) => {
 // @access    protect
 exports.select = async (req, res) => {
   try {
-    const items = await Admin.find(
-      {},
-      { _id: 0, id: "$_id", value: "$name" }
-    );
+    const items = await Admin.find({}, { _id: 0, id: "$_id", value: "$name" });
     return res.status(200).send(items);
   } catch (err) {
     console.log(err);

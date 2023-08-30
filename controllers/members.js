@@ -6,9 +6,8 @@ const Membersgroup = require("../models/membersGroup");
 // @route     POST /api/v1/members
 // @access    protect
 exports.createMember = async (req, res) => {
-  console.log(req.body);
   try {
-    const newMember = await Members.create(req.body);
+    const newMember = await Members.create({ ...req.body, userType: "Member" });
     res.status(200).json({
       success: true,
       message: "Member created successfully",
@@ -32,9 +31,9 @@ exports.getMembers = async (req, res) => {
 
     if (id && mongoose.isValidObjectId(id)) {
       const member = await Members.findById(id)
-        .populate("memberStatus")
+        // .populate("memberStatus")
         .populate("designation")
-        .populate("groupId");
+        .populate("group");
       return res.status(200).json({
         success: true,
         message: "Retrieved specific member",
@@ -52,7 +51,7 @@ exports.getMembers = async (req, res) => {
       Members.find(query)
         .populate("memberStatus")
         .populate("designation")
-        .populate("groupId")
+        // .populate("groupId")
         .skip(parseInt(skip) || 0)
         .limit(parseInt(limit) || 50)
         .sort({ _id: -1 }),

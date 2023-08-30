@@ -20,21 +20,21 @@ const associatesSchema = new mongoose.Schema(
     },
     profession: {
       type: String,
-      required: true,
+      // required: true,
     },
     qualification: {
       type: String,
-      required: true,
+      // required: true,
     },
     areaOfInterest: {
       type: String,
-      required: true,
+      // required: true,
     },
     birthulmal: {
       type: String,
       required: true,
     },
-    type: {
+    userType: {
       type: String,
       enum: ["Associates"],
       required: true,
@@ -42,17 +42,22 @@ const associatesSchema = new mongoose.Schema(
     dob: {
       type: String,
     },
+    // memberStatus: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "MemberStatus",
+    //   required: true,
+    // },
     memberStatus: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "MemberStatus",
+      type: Boolean,
+      // ref: "MemberStatus",
       required: true,
     },
     designation: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Designation",
-      required: true,
+      // required: true,
     },
-    groupId: {
+    group: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Membersgroup",
       required: true,
