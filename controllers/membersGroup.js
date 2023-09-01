@@ -1,5 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const Membersgroup = require("../models/membersGroup");
+const Bithulmal = require("../models/bithulmal");
 
 // @desc      CREATE NEW MEMBERS GROUP
 // @route     POST /api/v1/membersgroup
@@ -51,10 +52,25 @@ exports.getMembersGroups = async (req, res) => {
         .sort({ _id: -1 }),
     ]);
 
+    const groupDataPromises = data.map(async (group) => {
+      const bithulmals = await Bithulmal.find({ group: group._id });
+      const sumAmountPaid = bithulmals.reduce((acc, current) => {
+        return acc + parseFloat(current.amountPaid || 0);
+      }, 0);
+
+      return {
+        group: group,
+        area: group?.area,
+        totalAmountPaid: sumAmountPaid,
+      };
+    });
+
+    const groupData = await Promise.all(groupDataPromises);
+
     res.status(200).json({
       success: true,
-      message: `Retrieved all members groups`,
-      response: data,
+      message: `Retrieved all members groups with total amounts`,
+      response: groupData,
       count: data.length,
       totalCount: totalCount || 0,
       filterCount: filterCount || 0,

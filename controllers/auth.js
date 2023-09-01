@@ -63,7 +63,6 @@ const sendTokenResponse = async (user, res) => {
       message: "Something went wrong!",
     });
   } else {
-    console.log(userType);
     const menu = await getMenu(userType);
     const member = await Members.findOne({ user: user._id });
     const memberGroup = await Membersgroup.findOne({ member: member?._id });
@@ -133,13 +132,9 @@ exports.login = async (req, res) => {
 // @route     POST /api/v1/auth/admin-login
 // @access    Public
 exports.adminLogin = async (req, res) => {
-  console.log(req.body);
   const { username } = req.body;
   try {
-    const admin = await Admin.findOne({ username })
-      .populate("group") // Populate the membersGroupId field
-      .exec();
-    console.log(admin);
+    const admin = await Admin.findOne({ username }).populate("group").exec();
 
     if (!admin) {
       res.status(200).json({

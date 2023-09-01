@@ -3,13 +3,13 @@ const mongoose = require("mongoose");
 const bithulmalSchema = new mongoose.Schema(
   {
     month: {
-      type: String,
+      type: Date,
     },
-    memberId: {
+    member: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Member",
     },
-    groupId: {
+    group: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Membersgroup",
     },

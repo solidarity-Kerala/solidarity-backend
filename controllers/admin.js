@@ -6,7 +6,6 @@ const Admin = require("../models/adminModel");
 // @route     POST /api/v1/admin
 // @access    protect
 exports.createAdmin = async (req, res) => {
-  console.log(req.body);
   try {
     const { name, username, password, undefined } = req.body;
     const newAdmin = await Admin.create(req.body);

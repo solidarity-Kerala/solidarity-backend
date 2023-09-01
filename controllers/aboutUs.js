@@ -12,7 +12,6 @@ exports.createAboutUs = async (req, res) => {
       message: "Successfully added about us",
       response,
     });
-    console.log(response);
   } catch (err) {
     console.log(err);
     res.status(400).json({

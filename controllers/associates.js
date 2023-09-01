@@ -6,7 +6,6 @@ const Membersgroup = require("../models/membersGroup");
 // @route     POST /api/v1/associates
 // @access    protect
 exports.createAssociates = async (req, res) => {
-  console.log(req.body);
   try {
     const newAssociates = await Associates.create({
       ...req.body,
@@ -30,7 +29,6 @@ exports.createAssociates = async (req, res) => {
 // @route     GET /api/v1/associates
 // @access    public
 exports.getAssociates = async (req, res) => {
-  console.log(req.query);
   try {
     const { id, skip, limit, searchkey } = req.query;
 

@@ -51,11 +51,13 @@ exports.getMembers = async (req, res) => {
       Members.find(query)
         .populate("memberStatus")
         .populate("designation")
-        // .populate("groupId")
+        .populate("group")
         .skip(parseInt(skip) || 0)
         .limit(parseInt(limit) || 50)
         .sort({ _id: -1 }),
     ]);
+
+    console.log(query);
 
     res.status(200).json({
       success: true,
@@ -165,8 +167,6 @@ exports.getMembersByArea = async (req, res) => {
     // Find the Membersgroup with the given areaId to check if it exists
     const area = await Membersgroup.findOne({ area: areaId });
 
-    console.log({ area });
-
     if (!area) {
       return res.json({
         success: true,
@@ -178,8 +178,6 @@ exports.getMembersByArea = async (req, res) => {
 
     // Find all members with the given areaId
     const members = await Members.find({ groupId: area._id });
-
-    console.log({ members });
 
     if (members.length === 0) {
       return res.json({

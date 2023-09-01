@@ -30,8 +30,8 @@ exports.getAttendances = async (req, res) => {
 
     if (id && mongoose.isValidObjectId(id)) {
       const attendance = await Attendance.findById(id)
-        .populate("groupId")
-        .populate("memberId");
+        .populate("group")
+        .populate("member");
       return res.status(200).json({
         success: true,
         message: "Retrieved specific attendance",
@@ -39,16 +39,26 @@ exports.getAttendances = async (req, res) => {
       });
     }
 
-    const query = searchkey
-      ? { ...req.filter, status: { $regex: searchkey, $options: "i" } }
+    let query;
+    query = searchkey
+      ? { ...req.filter, month: { $regex: searchkey, $options: "i" } }
       : req.filter;
+
+    if (req.query?.startDate && req.query?.startDate) {
+      query = {
+        date: {
+          $gte: req.query?.startDate,
+          $lte: req.query?.endDate,
+        },
+      };
+    }
 
     const [totalCount, filterCount, data] = await Promise.all([
       parseInt(skip) === 0 && Attendance.countDocuments(),
       parseInt(skip) === 0 && Attendance.countDocuments(query),
       Attendance.find(query)
-        .populate("groupId")
-        .populate("memberId")
+        .populate("group")
+        .populate("member")
         .skip(parseInt(skip) || 0)
         .limit(parseInt(limit) || 50)
         .sort({ _id: -1 }),
@@ -142,7 +152,7 @@ exports.getAttendanceReportByMemberGroup = async (req, res) => {
 
     // Define and set the query based on the searchkey parameter if provided
     const query = searchkey
-      ? { groupId: { $regex: searchkey, $options: "i" } }
+      ? { group: { $regex: searchkey, $options: "i" } }
       : {};
 
     // Calculate total present and absent for each member group
@@ -150,7 +160,7 @@ exports.getAttendanceReportByMemberGroup = async (req, res) => {
       { $match: query },
       {
         $group: {
-          _id: "$groupId",
+          _id: "$group",
           totalPresent: {
             $sum: { $cond: [{ $eq: ["$status", "Present"] }, 1, 0] },
           },
@@ -173,7 +183,7 @@ exports.getAttendanceReportByMemberGroup = async (req, res) => {
       {
         $project: {
           _id: 0,
-          groupId: "$_id",
+          group: "$_id",
           groupName: "$groupInfo.groupName",
           totalPresent: 1,
           totalAbsent: 1,
@@ -246,12 +256,12 @@ exports.getAttendanceReportByMonth = async (req, res) => {
 
 exports.getAttendanceByMember = async (req, res) => {
   try {
-    const { memberId, startMonth, endMonth } = req.query;
+    const { member, startMonth, endMonth } = req.query;
 
-    if (!memberId || !mongoose.isValidObjectId(memberId)) {
+    if (!member || !mongoose.isValidObjectId(member)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid memberId provided.",
+        message: "Invalid member provided.",
       });
     }
 
@@ -268,15 +278,15 @@ exports.getAttendanceByMember = async (req, res) => {
       });
     }
 
-    // Find the attendance records for the specified memberId and within the date range
+    // Find the attendance records for the specified member and within the date range
     const attendance = await Attendance.find({
-      memberId: memberId,
+      member: member,
       date: { $gte: startDate, $lte: endDate },
     }).sort({ date: 1 });
 
     res.status(200).json({
       success: true,
-      message: `Retrieved attendance for member with ID: ${memberId}`,
+      message: `Retrieved attendance for member with ID: ${member}`,
       response: attendance,
       count: attendance.length,
     });
@@ -309,7 +319,7 @@ exports.getPresentAbsentMembersByMonth = async (req, res) => {
     // Find the attendance records within the date range
     const attendance = await Attendance.find({
       date: { $gte: startDate, $lte: endDate },
-    }).populate("memberId");
+    }).populate("member");
 
     // Initialize variables to store present and absent members
     const presentMembers = [];
@@ -318,9 +328,9 @@ exports.getPresentAbsentMembersByMonth = async (req, res) => {
     // Iterate through the attendance records and categorize members into present and absent lists
     attendance.forEach((record) => {
       if (record.status === "Present") {
-        presentMembers.push(record.memberId);
+        presentMembers.push(record.member);
       } else if (record.status === "Absent") {
-        absentMembers.push(record.memberId);
+        absentMembers.push(record.member);
       }
     });
 
@@ -350,7 +360,7 @@ exports.getPresentAbsentMembersByMonth = async (req, res) => {
 };
 exports.getPresentAbsentMembersByMonthwithcount = async (req, res) => {
   try {
-    const { groupId, startMonth, endMonth } = req.query;
+    const { group, startMonth, endMonth } = req.query;
     // Convert the startMonth and endMonth strings to JavaScript Date objects
     const startDate = new Date(startMonth);
     const endDate = new Date(endMonth);
@@ -364,7 +374,7 @@ exports.getPresentAbsentMembersByMonthwithcount = async (req, res) => {
     }
     // Define the query based on the provided parameters
     const query = {
-      groupId: new mongoose.Types.ObjectId(groupId), // Use new with mongoose.Types.ObjectId
+      group: new mongoose.Types.ObjectId(group), // Use new with mongoose.Types.ObjectId
       date: { $gte: startDate, $lte: endDate },
     };
     // Calculate total present and absent for each member within the specified group and month range
@@ -373,8 +383,8 @@ exports.getPresentAbsentMembersByMonthwithcount = async (req, res) => {
       {
         $group: {
           _id: {
-            memberId: "$memberId",
-            groupId: "$groupId",
+            member: "$member",
+            group: "$group",
           },
           totalPresent: {
             $sum: { $cond: [{ $eq: ["$status", "Present"] }, 1, 0] },
@@ -387,7 +397,7 @@ exports.getPresentAbsentMembersByMonthwithcount = async (req, res) => {
       {
         $lookup: {
           from: "members", // Replace with the actual name of the member collection
-          localField: "_id.memberId",
+          localField: "_id.member",
           foreignField: "_id",
           as: "memberInfo",
         },
@@ -398,9 +408,9 @@ exports.getPresentAbsentMembersByMonthwithcount = async (req, res) => {
       {
         $project: {
           _id: 0,
-          memberId: "$_id.memberId",
+          member: "$_id.member",
           memberName: "$memberInfo.name",
-          groupName: "$_id.groupId",
+          groupName: "$_id.group",
           totalPresent: 1,
           totalAbsent: 1,
         },

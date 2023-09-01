@@ -31,29 +31,42 @@ exports.getBithulmals = async (req, res) => {
 
     if (id && mongoose.isValidObjectId(id)) {
       const bithulmal = await Bithulmal.findById(id)
-        .populate("memberId")
-        .populate("groupId");
+        .populate("member")
+        .populate("group");
       return res.status(200).json({
         success: true,
         message: "Retrieved specific bithulmal",
         response: bithulmal,
       });
     }
-
-    const query = searchkey
+    let query;
+    query = searchkey
       ? { ...req.filter, month: { $regex: searchkey, $options: "i" } }
       : req.filter;
+
+    if (req.query?.startDate && req.query?.startDate) {
+      query = {
+        month: {
+          $gte: req.query?.startDate,
+          $lte: req.query?.endDate,
+        },
+      };
+    }
 
     const [totalCount, filterCount, data] = await Promise.all([
       parseInt(skip) === 0 && Bithulmal.countDocuments(),
       parseInt(skip) === 0 && Bithulmal.countDocuments(query),
       Bithulmal.find(query)
-        .populate("memberId")
-        .populate("groupId")
+        .populate("member")
+        .populate("group")
         .skip(parseInt(skip) || 0)
         .limit(parseInt(limit) || 50)
         .sort({ _id: -1 }),
     ]);
+
+    const sumAmountPaid = data.reduce((acc, current) => {
+      return acc + parseFloat(current.amountPaid || 0);
+    }, 0);
 
     res.status(200).json({
       success: true,
@@ -191,15 +204,15 @@ exports.getBithulmalReportByMemberGroup = async (req, res) => {
       groupId: req.query.groupId,
       month: req.query.month,
     }).populate({
-      path: 'memberId',
-      select: 'name'
+      path: "memberId",
+      select: "name",
     });
 
-    const simplifiedResponse = response.map(entry => {
+    const simplifiedResponse = response.map((entry) => {
       return {
         amount: entry.amount,
         amountPaid: entry.amountPaid,
-        memberName: entry.memberId.name
+        memberName: entry.memberId.name,
       };
     });
 
@@ -265,7 +278,6 @@ exports.getAmountPaidByMemberInMemberGroup = async (req, res) => {
 };
 
 exports.sumBithumalAmount = async (req, res) => {
-  console.log(req.query)
   try {
     const { searchkey, month } = req.query;
 
@@ -274,11 +286,14 @@ exports.sumBithumalAmount = async (req, res) => {
         $match: {
           groupId: req.query.groupId,
           // month: req.query.month,
-        }
+        },
       },
     ];
 
-    const bithulmalEntries = await Bithulmal.find({ groupId: req.query.groupId, month: req.query.month })
+    const bithulmalEntries = await Bithulmal.find({
+      groupId: req.query.groupId,
+      month: req.query.month,
+    });
     let totalAmountPaid = 0;
 
     for (const entry of bithulmalEntries) {

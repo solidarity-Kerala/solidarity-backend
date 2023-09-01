@@ -5,7 +5,6 @@ const District = require("../models/district");
 // @route     POST /api/v1/district
 // @access    protect
 exports.createDistrict = async (req, res) => {
-  console.log(req.body);
   try {
     const newDistrict = await District.create(req.body);
     res.status(200).json({

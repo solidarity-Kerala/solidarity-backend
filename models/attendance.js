@@ -4,11 +4,11 @@ const attendanceSchema = new mongoose.Schema(
     date: {
       type: Date,
     },
-    groupId: {
+    group: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Membersgroup",
     },
-    memberId: {
+    member: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Member",
     },
