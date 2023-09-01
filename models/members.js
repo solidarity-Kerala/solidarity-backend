@@ -46,14 +46,9 @@ const membersSchema = new mongoose.Schema(
     dob: {
       type: String,
     },
-    // memberStatus: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "MemberStatus",
-    //   required: true,
-    // },
     memberStatus: {
-      type: Boolean,
-      // ref: "MemberStatus",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "MemberStatus",
       required: true,
     },
     designation: {

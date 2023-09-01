@@ -59,6 +59,7 @@ exports.getMembersGroups = async (req, res) => {
       }, 0);
 
       return {
+        _id: group._id,
         group: group,
         area: group?.area,
         totalAmountPaid: sumAmountPaid,

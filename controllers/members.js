@@ -6,6 +6,7 @@ const Membersgroup = require("../models/membersGroup");
 // @route     POST /api/v1/members
 // @access    protect
 exports.createMember = async (req, res) => {
+  console.log(req.body);
   try {
     const newMember = await Members.create({ ...req.body, userType: "Member" });
     res.status(200).json({
