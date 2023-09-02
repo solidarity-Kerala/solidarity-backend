@@ -53,6 +53,27 @@ exports.getBithulmals = async (req, res) => {
       };
     }
 
+    if (req.query?.month) {
+      const selectedMonth = new Date(req.query.month);
+      const startOfMonth = new Date(
+        selectedMonth.getFullYear(),
+        selectedMonth.getMonth(),
+        1
+      );
+      const endOfMonth = new Date(
+        selectedMonth.getFullYear(),
+        selectedMonth.getMonth() + 1,
+        0
+      );
+
+      query = {
+        month: {
+          $gte: startOfMonth,
+          $lte: endOfMonth,
+        },
+      };
+    }
+
     const [totalCount, filterCount, data] = await Promise.all([
       parseInt(skip) === 0 && Bithulmal.countDocuments(),
       parseInt(skip) === 0 && Bithulmal.countDocuments(query),
@@ -75,6 +96,7 @@ exports.getBithulmals = async (req, res) => {
       count: data.length,
       totalCount: totalCount || 0,
       filterCount: filterCount || 0,
+      paidAmount: sumAmountPaid,
     });
   } catch (err) {
     console.log(err);
@@ -197,16 +219,20 @@ exports.getBithulmalReport = async (req, res) => {
 };
 
 exports.getBithulmalReportByMemberGroup = async (req, res) => {
+  console.log(req.query);
   try {
     const { searchkey, month } = req.query;
 
     const response = await Bithulmal.find({
-      groupId: req.query.groupId,
-      month: req.query.month,
-    }).populate({
-      path: "memberId",
-      select: "name",
-    });
+      group: req.query.group,
+      // month: req.query.month,
+    }).populate("member");
+    // .populate({
+    //   path: "member",
+    //   select: "name",
+    // });
+
+    console.log({ response });
 
     const simplifiedResponse = response.map((entry) => {
       return {
@@ -233,7 +259,7 @@ exports.getBithulmalReportByMemberGroup = async (req, res) => {
 exports.getAmountPaidByMemberInMemberGroup = async (req, res) => {
   try {
     const memberAmounts = await Bithulmal.aggregate([
-      { $match: { groupId: new mongoose.Types.ObjectId(req.query.groupId) } },
+      { $match: { group: new mongoose.Types.ObjectId(req.query.group) } },
       {
         $group: {
           _id: "$memberId",
@@ -284,14 +310,14 @@ exports.sumBithumalAmount = async (req, res) => {
     const aggregationPipeline = [
       {
         $match: {
-          groupId: req.query.groupId,
+          group: req.query.group,
           // month: req.query.month,
         },
       },
     ];
 
     const bithulmalEntries = await Bithulmal.find({
-      groupId: req.query.groupId,
+      group: req.query.group,
       month: req.query.month,
     });
     let totalAmountPaid = 0;

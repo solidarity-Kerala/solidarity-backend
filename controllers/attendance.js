@@ -145,7 +145,6 @@ exports.deleteAttendance = async (req, res) => {
 // @desc      GET Attendance Report by Member Group
 // @route     GET /api/v1/attendance/report/membergroup
 // @access    public
-
 exports.getAttendanceReportByMemberGroup = async (req, res) => {
   try {
     const { searchkey } = req.query;
