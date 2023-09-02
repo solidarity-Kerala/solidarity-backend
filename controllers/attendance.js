@@ -359,24 +359,6 @@ exports.getPresentAbsentMembersByMonth = async (req, res) => {
 };
 exports.getPresentAbsentMembersByMonthwithcount = async (req, res) => {
   try {
-    // const { group, startMonth, endMonth } = req.query;
-    // Convert the startMonth and endMonth strings to JavaScript Date objects
-    // const startDate = new Date(startMonth);
-    // const endDate = new Date(endMonth);
-    // // Ensure that the endDate is greater than or equal to the startDate
-    // if (startDate > endDate) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message:
-    //       "Invalid date range. The end date should be greater than or equal to the start date.",
-    //   });
-    // }
-
-    // const query = {
-    //   group: new mongoose.Types.ObjectId(req.query?.group),
-    //   date: { $gte: req.query?.startDate, $lte: endDate },
-    // };
-
     const startDate = new Date(req.query?.startDate);
     const endDate = new Date(req.query?.endDate);
     const groupId = req.query?.group;
@@ -403,45 +385,6 @@ exports.getPresentAbsentMembersByMonthwithcount = async (req, res) => {
 
     console.log("Absent Attendances:", absentAttendances);
     console.log("Present Attendances:", presentAttendances);
-    // Calculate total present and absent for each member within the specified group and month range
-    // const memberGroupMonthAttendances = await Attendance.aggregate([
-    //   { $match: query },
-    //   // {
-    //   //   $group: {
-    //   //     _id: {
-    //   //       member: "$member",
-    //   //       group: "$group",
-    //   //     },
-    //   //     totalPresent: {
-    //   //       $sum: { $cond: [{ $eq: ["$status", "Present"] }, 1, 0] },
-    //   //     },
-    //   //     totalAbsent: {
-    //   //       $sum: { $cond: [{ $eq: ["$status", "Absent"] }, 1, 0] },
-    //   //     },
-    //   //   },
-    //   // },
-    //   // {
-    //   //   $lookup: {
-    //   //     from: "members", // Replace with the actual name of the member collection
-    //   //     localField: "_id.member",
-    //   //     foreignField: "_id",
-    //   //     as: "memberInfo",
-    //   //   },
-    //   // },
-    //   // {
-    //   //   $unwind: "$memberInfo",
-    //   // },
-    //   // {
-    //   //   $project: {
-    //   //     _id: 0,
-    //   //     member: "$_id.member",
-    //   //     memberName: "$memberInfo.name",
-    //   //     groupName: "$_id.group",
-    //   //     totalPresent: 1,
-    //   //     totalAbsent: 1,
-    //   //   },
-    //   // },
-    // ]);
     res.status(200).json({
       success: true,
       message:
