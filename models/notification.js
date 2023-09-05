@@ -5,6 +5,9 @@ const NotificationSchema = new mongoose.Schema(
         title: {
             type: String,
         },
+        content: {
+            type: String,
+        },
         link: {
             type: String,
         },
