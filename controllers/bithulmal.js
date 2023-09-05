@@ -219,7 +219,6 @@ exports.getBithulmalReport = async (req, res) => {
 };
 
 exports.getBithulmalReportByMemberGroup = async (req, res) => {
-  console.log(req.query);
   try {
     const { searchkey, month } = req.query;
 
@@ -231,8 +230,6 @@ exports.getBithulmalReportByMemberGroup = async (req, res) => {
     //   path: "member",
     //   select: "name",
     // });
-
-    console.log({ response });
 
     const simplifiedResponse = response.map((entry) => {
       return {

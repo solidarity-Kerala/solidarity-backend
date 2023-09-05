@@ -416,12 +416,10 @@ exports.getPresentAbsentMembersByMonthwithcount = async (req, res) => {
 // @route     GET /api/v1/attendance/by-group
 // @access    protect
 exports.getAttendanceByGroup = async (req, res) => {
-  console.log(req.query);
   try {
     const startDate = new Date(req.query?.startDate);
     const endDate = new Date(req.query?.endDate);
     const groupId = req.query?.group;
-    const memberId = req.query?.member;
 
     const query = {
       date: {
