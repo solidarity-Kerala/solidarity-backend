@@ -362,14 +362,27 @@ exports.getPresentAbsentMembersByMonthwithcount = async (req, res) => {
     const startDate = new Date(req.query?.startDate);
     const endDate = new Date(req.query?.endDate);
     const groupId = req.query?.group;
+    const memberId = req.query?.member;
 
-    const query = {
-      group: new mongoose.Types.ObjectId(groupId),
-      date: {
-        $gte: startDate,
-        $lte: endDate,
-      },
-    };
+    let query;
+    if (req?.query?.group) {
+      query = {
+        group: new mongoose.Types.ObjectId(groupId),
+        date: {
+          $gte: startDate,
+          $lte: endDate,
+        },
+      };
+    }
+    if (req?.query?.member) {
+      query = {
+        member: new mongoose.Types.ObjectId(memberId),
+        date: {
+          $gte: startDate,
+          $lte: endDate,
+        },
+      };
+    }
 
     const memberGroupMonthAttendances = await Attendance.find(query).populate(
       "group member"
