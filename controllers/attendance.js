@@ -1,5 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const Attendance = require("../models/attendance");
+const Members = require("../models/members");
 
 // @desc      CREATE NEW ATTENDANCE
 // @route     POST /api/v1/attendance
@@ -357,6 +358,7 @@ exports.getPresentAbsentMembersByMonth = async (req, res) => {
     });
   }
 };
+
 exports.getPresentAbsentMembersByMonthwithcount = async (req, res) => {
   try {
     const startDate = new Date(req.query?.startDate);
@@ -364,53 +366,124 @@ exports.getPresentAbsentMembersByMonthwithcount = async (req, res) => {
     const groupId = req.query?.group;
     const memberId = req.query?.member;
 
-    let query;
-    if (req?.query?.group) {
-      query = {
-        group: new mongoose.Types.ObjectId(groupId),
-        date: {
-          $gte: startDate,
-          $lte: endDate,
-        },
-      };
+    const query = {
+      date: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+    };
+
+    if (groupId) {
+      query.group = new mongoose.Types.ObjectId(groupId);
     }
-    if (req?.query?.member) {
-      query = {
-        member: new mongoose.Types.ObjectId(memberId),
-        date: {
-          $gte: startDate,
-          $lte: endDate,
-        },
-      };
+
+    if (memberId) {
+      query.member = new mongoose.Types.ObjectId(memberId);
     }
 
     const memberGroupMonthAttendances = await Attendance.find(query).populate(
       "group member"
     );
 
-    const absentAttendances = memberGroupMonthAttendances.filter(
-      (attendance) => attendance.status === "Absent"
+    const attendanceCounts = memberGroupMonthAttendances.reduce(
+      (counts, attendance) => {
+        counts[attendance.status] = (counts[attendance.status] || 0) + 1;
+        return counts;
+      },
+      {}
     );
 
-    const presentAttendances = memberGroupMonthAttendances.filter(
-      (attendance) => attendance.status === "Present"
-    );
+    console.log("Attendance Counts:", attendanceCounts);
 
-    console.log("Absent Attendances:", absentAttendances);
-    console.log("Present Attendances:", presentAttendances);
     res.status(200).json({
       success: true,
       message:
         "Retrieved present and absent count of each member by group and month",
       response: memberGroupMonthAttendances,
-      absentAttendances: absentAttendances.length,
-      presentAttendances: presentAttendances.length,
+      absentAttendances: attendanceCounts["Absent"] || 0,
+      presentAttendances: attendanceCounts["Present"] || 0,
     });
   } catch (err) {
     console.log(err);
     res.status(400).json({
       success: false,
       message: err.toString(),
+    });
+  }
+};
+
+// @desc      GET ATTENDANCE BY GROUP
+// @route     GET /api/v1/attendance/by-group
+// @access    protect
+exports.getAttendanceByGroup = async (req, res) => {
+  console.log(req.query);
+  try {
+    const startDate = new Date(req.query?.startDate);
+    const endDate = new Date(req.query?.endDate);
+    const groupId = req.query?.group;
+    const memberId = req.query?.member;
+
+    const query = {
+      date: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+    };
+
+    if (groupId) {
+      query.group = new mongoose.Types.ObjectId(groupId);
+    }
+
+    const attendances = await Attendance.find(query);
+
+    if (!attendances || attendances.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Attendance not found",
+      });
+    }
+
+    const memberCounts = {};
+
+    for (const attendance of attendances) {
+      const memberId = attendance.member.toString();
+      if (!memberCounts[memberId]) {
+        memberCounts[memberId] = {
+          Present: 0,
+          Absent: 0,
+        };
+      }
+      memberCounts[memberId][attendance.status]++;
+    }
+
+    const memberIds = Object.keys(memberCounts);
+    const memberNames = {};
+
+    for (const memberId of memberIds) {
+      const member = await Members.findById(memberId);
+      if (member) {
+        memberNames[memberId] = member.name;
+      }
+    }
+
+    const memberCountsResult = Object.keys(memberCounts).map((memberId) => {
+      return {
+        memberName: memberNames[memberId] || "",
+        Present: memberCounts[memberId].Present,
+        Absent: memberCounts[memberId].Absent,
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Attendance retrieved successfully",
+      memberCounts: memberCountsResult,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({
+      success: false,
+      message: err,
     });
   }
 };
