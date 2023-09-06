@@ -152,9 +152,7 @@ exports.adminLogin = async (req, res) => {
           success: true,
           message: "Admin logged in successfully.",
           adminId: admin._id,
-          membersGroupId: admin.membersGroupId
-            ? admin.membersGroupId._id
-            : null,
+          membersGroupId: admin.group?._id ? admin.group?._id : null,
           admin,
         });
       }
