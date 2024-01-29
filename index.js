@@ -12,6 +12,7 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
   "https://gentle-forest-0ff497700.3.azurestaticapps.net",
+  "https://solidarity-cms-szb9l.ondigitalocean.app",
 ];
 
 //cors policy
