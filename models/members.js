@@ -9,6 +9,10 @@ const membersSchema = new mongoose.Schema(
     name: {
       type: String,
     },
+    unit:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Unit",
+    },
     address: {
       type: String,
     },
@@ -27,8 +31,9 @@ const membersSchema = new mongoose.Schema(
     areaOfInterest: {
       type: String,
     },
-    birthulmal: {
-      type: String,
+    bithulmal: {
+      type: Number,
+     
     },
     userType: {
       type: String,

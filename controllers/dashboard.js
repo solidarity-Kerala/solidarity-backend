@@ -1,12 +1,12 @@
 const User = require("../models/user");
-const Appointment = require("../models/appointment");
+// const Appointment = require("../models/appointment");
 const Area = require("../models/area");
 const Attendance = require("../models/attendance");
 const Bithulmal = require("../models/bithulmal");
 const District = require("../models/district");
 const Members = require("../models/members");
 const Membersgroup = require("../models/membersGroup");
-const Associates = require("../models/associates");
+// const Associates = require("../models/associates");
 const moment = require("moment");
 const { default: mongoose } = require("mongoose");
 

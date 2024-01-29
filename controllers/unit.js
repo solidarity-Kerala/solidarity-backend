@@ -1,16 +1,16 @@
 const { default: mongoose } = require("mongoose");
-const Designation = require("../models/designation");
+const Unit = require("../models/unit");
 
-// @desc      CREATE NEW DESIGNATION
-// @route     POST /api/v1/designation
+// @desc      CREATE NEW UNIT
+// @route     POST /api/v1/unit
 // @access    protect
-exports.createDesignation = async (req, res) => {
+exports.createUnit = async (req, res) => {
   try {
-    const newDesignation = await Designation.create(req.body);
+    const newUnit = await Unit.create(req.body);
     res.status(200).json({
       success: true,
-      message: "Designation created successfully",
-      data: newDesignation,
+      message: "Unit created successfully",
+      data: newUnit,
     });
   } catch (err) {
     console.log(err);
@@ -21,30 +21,30 @@ exports.createDesignation = async (req, res) => {
   }
 };
 
-// @desc      GET ALL DESIGNATION
-// @route     GET /api/v1/designation
+// @desc      GET ALL UNIT
+// @route     GET /api/v1/unit
 // @access    public
-exports.getDesignation = async (req, res) => {
+exports.getUnit = async (req, res) => {
   try {
     const { id, skip, limit, searchkey } = req.query;
 
     if(id && mongoose.isValidObjectId(id)) {
-      const designation = await Designation.findById(id);
+      const unit = await Unit.findById(id);
       return res.status(200).json({
         success: true,
-        message: "Retrieved specific designation",
-        response: designation,
+        message: "Retrieved specific unit",
+        response: unit,
       });
     }
 
     const query = searchkey
-      ? { ...req.filter, designation: { $regex: searchkey, $options: "i" } }
+      ? { ...req.filter, title: { $regex: searchkey, $options: "i" } }
       : req.filter;
 
     const [totalCount, filterCount, data] = await Promise.all([
-      parseInt(skip) === 0 && Designation.countDocuments(),
-      parseInt(skip) === 0 && Designation.countDocuments(query),
-      Designation.find(query)
+      parseInt(skip) === 0 &&Unit.countDocuments(),
+      parseInt(skip) === 0 &&Unit.countDocuments(query),
+     Unit.find(query)
         .skip(parseInt(skip) || 0)
         .limit(parseInt(limit) || 50)
         .sort({ _id: -1 }),
@@ -52,7 +52,7 @@ exports.getDesignation = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `Retrieved all designation`,
+      message: `Retrieved all unit`,
       response: data,
       count: data.length,
       totalCount: totalCount || 0,
@@ -67,12 +67,12 @@ exports.getDesignation = async (req, res) => {
   }
 };
 
-// @desc      UPDATE SPECIFIC DESIGNATION
-// @route     PUT /api/v1/designation/:id
+// @desc      UPDATE SPECIFIC UNIT
+// @route     PUT /api/v1/unit/:id
 // @access    protect
-exports.updateDesignation = async (req, res) => {
+exports.updateUnit = async (req, res) => {
   try {
-    const designation = await Designation.findByIdAndUpdate(
+    const unit = await Unit.findByIdAndUpdate(
       req.body.id,
       req.body,
       {
@@ -80,17 +80,17 @@ exports.updateDesignation = async (req, res) => {
       }
     );
 
-    if(!designation) {
+    if(!unit) {
       return res.status(404).json({
         success: false,
-        message: "Designation not found",
+        message: "Unit not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: "Designation updated successfully",
-      data: designation,
+      message: "Unit updated successfully",
+      data: unit,
     });
   } catch (err) {
     console.log(err);
@@ -101,23 +101,23 @@ exports.updateDesignation = async (req, res) => {
   }
 };
 
-// @desc      DELETE SPECIFIC DESIGNATION
-// @route     DELETE /api/v1/designation/:id
+// @desc      DELETE SPECIFIC UNIT
+// @route     DELETE /api/v1/unit/:id
 // @access    protect
-exports.deleteDesignation = async (req, res) => {
+exports.deleteUnit = async (req, res) => {
   try {
-    const designation = await Designation.findByIdAndDelete(req.query.id);
+    const unit = await Unit.findByIdAndDelete(req.query.id);
 
-    if(!designation) {
+    if(!unit) {
       return res.status(404).json({
         success: false,
-        message: "Designation not found",
+        message: "Unit not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: "Designation deleted successfully",
+      message: "Unit deleted successfully",
     });
   } catch (err) {
     console.log(err);
@@ -128,14 +128,14 @@ exports.deleteDesignation = async (req, res) => {
   }
 };
 
-// @desc      GET Designation
-// @route     GET /api/v1/designation/select
+// @desc      GET UNIT
+// @route     GET /api/v1/unit/select
 // @access    protect
 exports.select = async (req, res) => {
   try {
     const items = await Designation.find(
       {},
-      { _id: 0, id: "$_id", value: "$designation" }
+      { _id: 0, id: "$_id", value: "$title" }
     );
     return res.status(200).send(items);
   } catch (err) {
