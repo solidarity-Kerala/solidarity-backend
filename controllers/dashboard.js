@@ -30,7 +30,7 @@ exports.count = async (req, res) => {
       District.countDocuments(),
       Members.countDocuments(),
       Membersgroup.countDocuments(),
-      Associates.countDocuments(),
+      // Associates.countDocuments(),
     ]);
     console.log("count", areaCount);
 
