@@ -133,7 +133,7 @@ exports.deleteUnit = async (req, res) => {
 // @access    protect
 exports.select = async (req, res) => {
   try {
-    const items = await Designation.find(
+    const items = await Unit.find(
       {},
       { _id: 0, id: "$_id", value: "$title" }
     );

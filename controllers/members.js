@@ -48,7 +48,8 @@ exports.getMembers = async (req, res) => {
       const member = await Members.findById(id)
         // .populate("memberStatus")
         .populate("designation")
-        .populate("group");
+        .populate("group")
+        .populate("unit");
       return res.status(200).json({
         success: true,
         message: "Retrieved specific member",
@@ -67,6 +68,7 @@ exports.getMembers = async (req, res) => {
         .populate("memberStatus")
         .populate("designation")
         .populate("group")
+        .populate("unit")
         .skip(parseInt(skip) || 0)
         .limit(parseInt(limit) || 50)
         .sort({ _id: -1 }),

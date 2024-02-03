@@ -5,6 +5,7 @@ const {
   getUnit,
   updateUnit,
   deleteUnit,
+  select
 } =  require("../controllers/unit");
 // middleware
 const { protect, authorize } = require("../middleware/auth");
@@ -16,5 +17,5 @@ router
   .get(reqFilter, getUnit)
   .put(updateUnit)
   .delete(deleteUnit);
-
+router.get("/select",select)
 module.exports = router;
