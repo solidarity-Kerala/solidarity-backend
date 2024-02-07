@@ -3,7 +3,10 @@ const mongoose = require("mongoose");
 const bithulmalSchema = new mongoose.Schema(
   {
     month: {
-      type: Date,
+      type: String,
+    },
+    paymentDate:{
+      type:Date,
     },
     member: {
       type: mongoose.Schema.Types.ObjectId,
