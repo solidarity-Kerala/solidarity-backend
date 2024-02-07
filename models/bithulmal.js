@@ -3,6 +3,9 @@ const mongoose = require("mongoose");
 const bithulmalSchema = new mongoose.Schema(
   {
     month: {
+      type: String,
+    },
+    paymentDate: {
       type: Date,
     },
     member: {

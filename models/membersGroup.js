@@ -2,10 +2,6 @@ const mongoose = require("mongoose");
 
 const membersgroupSchema = new mongoose.Schema(
   {
-    member: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Members",
-    },
     groupName: {
       type: String,
     },
@@ -16,6 +12,10 @@ const membersgroupSchema = new mongoose.Schema(
     status: {
       type: Boolean,
       default: true,
+    },
+    district: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "District",
     },
   },
   { timestamps: true }

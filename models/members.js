@@ -2,10 +2,6 @@ const mongoose = require("mongoose");
 
 const membersSchema = new mongoose.Schema(
   {
-    user: {
-      type: mongoose.Schema.ObjectId,
-      ref: "User",
-    },
     name: {
       type: String,
     },
@@ -21,6 +17,7 @@ const membersSchema = new mongoose.Schema(
     },
     bloodGroup: {
       type: String,
+      enum: ["A","B","AB","O"],
     },
     profession: {
       type: String,
@@ -33,7 +30,6 @@ const membersSchema = new mongoose.Schema(
     },
     bithulmal: {
       type: Number,
-     
     },
     userType: {
       type: String,
