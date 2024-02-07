@@ -22,7 +22,7 @@ exports.count = async (req, res) => {
       districtCount,
       memberCount,
       memberGroupCount,
-      associatesCount,
+      // associatesCount,
     ] = await Promise.all([
       Area.countDocuments(),
       Attendance.countDocuments(),
@@ -30,7 +30,7 @@ exports.count = async (req, res) => {
       District.countDocuments(),
       Members.countDocuments(),
       Membersgroup.countDocuments(),
-      //Associates.countDocuments(),
+
     ]);
     console.log("count", areaCount);
 
@@ -63,13 +63,13 @@ exports.count = async (req, res) => {
         background: "#ebf1fb",
         color: "#5753cd",
       },
-      {
-        count: associatesCount,
-        title: "Associates",
-        icon: "associate",
-        background: "#ebf1fb",
-        color: "#5753cd",
-      },
+      // {
+      //   count: associatesCount,
+      //   title: "Associates",
+      //   icon: "associate",
+      //   background: "#ebf1fb",
+      //   color: "#5753cd",
+      // },
       {
         count: bithulmalCount,
         title: "Bithulmal",

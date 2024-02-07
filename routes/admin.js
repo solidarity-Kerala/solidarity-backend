@@ -6,7 +6,7 @@ const {
   updateAdmin,
   deleteAdmin,
   select,
-} = require("../controllers/admin");
+} = require("../controllers/adminModel");
 
 // middleware
 const { protect, authorize } = require("../middleware/auth");
