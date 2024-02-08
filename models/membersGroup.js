@@ -5,6 +5,9 @@ const membersgroupSchema = new mongoose.Schema(
     groupName: {
       type: String,
     },
+    murabbiName:{
+      title:String,
+    },
     area: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Area",
