@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 
 const membersSchema = new mongoose.Schema(
   {
-    
     name: {
       type: String,
     },
@@ -18,7 +17,7 @@ const membersSchema = new mongoose.Schema(
     },
     bloodGroup: {
       type: String,
-      
+      enum: ["A+","A-","B+","B-","AB+","AB-","O+","O-"],
     },
     profession: {
       type: String,
@@ -31,7 +30,6 @@ const membersSchema = new mongoose.Schema(
     },
     bithulmal: {
       type: Number,
-     
     },
     userType: {
       type: String,

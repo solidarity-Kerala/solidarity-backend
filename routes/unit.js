@@ -17,5 +17,7 @@ router
   .get(reqFilter, getUnit)
   .put(updateUnit)
   .delete(deleteUnit);
-router.get("/select",select)
+
+router.get("/select", reqFilter, select);
+
 module.exports = router;

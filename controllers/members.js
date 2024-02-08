@@ -10,6 +10,7 @@ exports.createMember = async (req, res) => {
     // const newMember = await Members.create({ ...req.body, userType: "Member" });
     const newMember = await Members.create({
       name: req.body?.name,
+      // unit: req.body?.unit,
       address: req.body?.name,
       mobileNumber: req.body?.mobileNumber,
       bloodGroup: req.body?.bloodGroup,
