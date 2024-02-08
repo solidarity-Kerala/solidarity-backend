@@ -1,4 +1,4 @@
-const Admin = require("../models/adminModel");
+const Admin = require("../models/admin");
 const Members = require("../models/members");
 const Membersgroup = require("../models/membersGroup");
 const Menu = require("../models/menu");
