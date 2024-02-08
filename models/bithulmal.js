@@ -5,8 +5,8 @@ const bithulmalSchema = new mongoose.Schema(
     month: {
       type: String,
     },
-    paymentDate: {
-      type: Date,
+    paymentDate:{
+      type:Date,
     },
     member: {
       type: mongoose.Schema.Types.ObjectId,

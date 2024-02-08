@@ -1,22 +1,22 @@
 const router = require("express").Router();
-// controllers
+// Controllers
 const {
-  createUnit,
-  getUnit,
-  updateUnit,
-  deleteUnit,
-  select
-} =  require("../controllers/unit");
-// middleware
+  createDownload,
+  getDownload,
+  updateDownload,
+  deleteDownload,
+  select,
+} = require("../controllers/download");
+// Middleware
 const { protect, authorize } = require("../middleware/auth");
 const { reqFilter } = require("../middleware/filter");
 
 router
   .route("/")
-  .post(createUnit)
-  .get(reqFilter, getUnit)
-  .put(updateUnit)
-  .delete(deleteUnit);
+  .post(createDownload)
+  .get(reqFilter, getDownload)
+  .put(updateDownload)
+  .delete(deleteDownload);
 
 router.get("/select", reqFilter, select);
 

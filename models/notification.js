@@ -11,6 +11,9 @@ const NotificationSchema = new mongoose.Schema(
         link: {
             type: String,
         },
+        image: {
+            type:String
+        }
     },
     { timestamps: true }
 );
