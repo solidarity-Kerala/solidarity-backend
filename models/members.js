@@ -31,6 +31,9 @@ const membersSchema = new mongoose.Schema(
     bithulmal: {
       type: Number,
     },
+    email: {
+      type: String,
+    },
     userType: {
       type: String,
       enum: ["Member"],
