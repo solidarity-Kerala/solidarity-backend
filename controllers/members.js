@@ -22,6 +22,7 @@ exports.createMember = async (req, res) => {
       memberStatus: req.body?.memberStatus,
       designation: req.body?.designation || null,
       group: req.body?.group,
+      email: req.body?.email,
       userType: "Member",
     });
     res.status(200).json({
