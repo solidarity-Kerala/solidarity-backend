@@ -47,6 +47,7 @@ exports.getMembersGroups = async (req, res) => {
       parseInt(skip) === 0 && Membersgroup.countDocuments(query),
       Membersgroup.find(query)
         .populate("area")
+        .populate("district")
         .skip(parseInt(skip) || 0)
         .limit(parseInt(limit) || 50)
         .sort({ _id: -1 }),
