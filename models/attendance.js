@@ -21,10 +21,11 @@ const attendanceSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Present", "Absent"],
+      enum: ["Present", "Absent","Leave"],
     },
     month: {
       type: String,
+      enum: ["January", "February","March","April","May","June","July","August","September","October","November","December"],
     },
   },
   { timestamps: true }

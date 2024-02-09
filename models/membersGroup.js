@@ -6,7 +6,7 @@ const membersgroupSchema = new mongoose.Schema(
       type: String,
     },
     murabbiName:{
-      title:String,
+      type:String,
     },
     area: {
       type: mongoose.Schema.Types.ObjectId,
