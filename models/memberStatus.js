@@ -4,6 +4,7 @@ const MemberStatusSchema = new mongoose.Schema(
   {
     status: {
       type: String,
+      enum:['ActiveMembers','InactiveMembers']
     },
   },
   { timestamps: true }

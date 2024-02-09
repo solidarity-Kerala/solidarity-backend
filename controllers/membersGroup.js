@@ -2,6 +2,7 @@ const { default: mongoose } = require("mongoose");
 const Membersgroup = require("../models/membersGroup");
 const Bithulmal = require("../models/bithulmal");
 
+
 // @desc      CREATE NEW MEMBERS GROUP
 // @route     POST /api/v1/membersgroup
 // @access    protect
@@ -42,9 +43,13 @@ exports.getMembersGroups = async (req, res) => {
       ? { ...req.filter, groupName: { $regex: searchkey, $options: "i" } }
       : req.filter;
 
-    const [totalCount, filterCount, data] = await Promise.all([
+    const [totalCount,filterCount,totalMembersCount, activeMembersCount,inactiveMembersCount,abroadMembersCount,data] = await Promise.all([
       parseInt(skip) === 0 && Membersgroup.countDocuments(),
       parseInt(skip) === 0 && Membersgroup.countDocuments(query),
+      Membersgroup.countDocuments({ ...query, isActive: true }),
+      Membersgroup.countDocuments({ ...query, isAbroad: true }),
+      Membersgroup.countDocuments({ ...query, isInactive: false }),
+      Membersgroup.countDocuments({ status: true }),
       Membersgroup.find(query)
         .populate("area")
         .populate("district")
@@ -52,7 +57,12 @@ exports.getMembersGroups = async (req, res) => {
         .limit(parseInt(limit) || 50)
         .sort({ _id: -1 }),
     ]);
-
+    console.log('Total Count:', totalCount);
+    console.log('Active Members Count:', activeMembersCount);
+    console.log('Abroad Members Count:', abroadMembersCount);
+    console.log('Inactive Members Count:', inactiveMembersCount);
+    
+    
     const groupDataPromises = data.map(async (group) => {
       const bithulmals = await Bithulmal.find({ group: group._id });
       const sumAmountPaid = bithulmals.reduce((acc, current) => {
@@ -76,6 +86,11 @@ exports.getMembersGroups = async (req, res) => {
       count: data.length,
       totalCount: totalCount || 0,
       filterCount: filterCount || 0,
+      totalMembersCount: totalMembersCount || 0,
+      activeMembersCount: activeMembersCount || 0,
+      abroadMembersCount: abroadMembersCount || 0,
+      inactiveMembersCount: inactiveMembersCount || 0,
+
     });
   } catch (err) {
     console.log(err);
@@ -85,6 +100,8 @@ exports.getMembersGroups = async (req, res) => {
     });
   }
 };
+
+
 
 // @desc      UPDATE SPECIFIC MEMBERS GROUP
 // @route     PUT /api/v1/membersgroup/:id

@@ -8,6 +8,7 @@ const membersSchema = new mongoose.Schema(
     unit:{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Unit",
+      default: null
     },
     address: {
       type: String,

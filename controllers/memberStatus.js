@@ -58,6 +58,7 @@ exports.getMembersStatus = async (req, res) => {
       totalCount: totalCount || 0,
       filterCount: filterCount || 0,
     });
+    
   } catch (err) {
     console.log(err);
     res.status(400).json({
