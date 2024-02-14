@@ -6,20 +6,20 @@ const Bithulmal = require("../models/bithulmal");
 // @route     POST /api/v1/membersgroup
 // @access    protect
 exports.createMembersGroup = async (req, res) => {
-  try {
-    const newMembersGroup = await Membersgroup.create(req.body);
-    res.status(200).json({
-      success: true,
-      message: "Members group created successfully",
-      data: newMembersGroup,
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(400).json({
-      success: false,
-      message: err,
-    });
-  }
+try {
+  const newMembersGroup = await Membersgroup.create(req.body);
+  res.status(200).json({
+    success: true,
+    message: "Member group created successfully",
+    data: newMembersGroup,
+  });
+} catch (err) {
+  console.log(err);
+  res.status(400).json({
+    success: false,
+    message: err,
+  });
+}
 };
 
 // @desc      GET ALL MEMBERS GROUPS
@@ -53,26 +53,26 @@ exports.getMembersGroups = async (req, res) => {
         .sort({ _id: -1 }),
     ]);
 
-    const groupDataPromises = data.map(async (group) => {
-      const bithulmals = await Bithulmal.find({ group: group._id });
-      const sumAmountPaid = bithulmals.reduce((acc, current) => {
-        return acc + parseFloat(current.amountPaid || 0);
-      }, 0);
+    // const groupDataPromises = data.map(async (group) => {
+    //   const bithulmals = await Bithulmal.find({ group: group._id });
+    //   const sumAmountPaid = bithulmals.reduce((acc, current) => {
+    //     return acc + parseFloat(current.amountPaid || 0);
+    //   }, 0);
 
-      return {
-        _id: group._id,
-        group: group,
-        area: group?.area,
-        totalAmountPaid: sumAmountPaid,
-      };
-    });
+    //   return {
+    //     _id: group._id,
+    //     group: group,
+    //     area: group?.area,
+    //     totalAmountPaid: sumAmountPaid,
+    //   };
+    // });
 
-    const groupData = await Promise.all(groupDataPromises);
+    // const groupData = await Promise.all(groupDataPromises);
 
     res.status(200).json({
       success: true,
-      message: `Retrieved all members groups with total amounts`,
-      response: groupData,
+      message: `Retrieved all members groups`,
+      response: data,
       count: data.length,
       totalCount: totalCount || 0,
       filterCount: filterCount || 0,

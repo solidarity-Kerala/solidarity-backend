@@ -1,14 +1,10 @@
 const mongoose = require("mongoose");
 const attendanceSchema = new mongoose.Schema(
   {
-    // title:{
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Meeting",
-    // },
     date: {
       type: Date,
     },
-    place:{
+    place: {
       type: String,
     },
     group: {
@@ -21,11 +17,11 @@ const attendanceSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Present", "Absent","Leave"],
+      enum: ["Present", "Absent", "Leave"],
     },
     month: {
       type: String,
-      enum: ["January", "February","March","April","May","June","July","August","September","October","November","December"],
+      enum: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     },
   },
   { timestamps: true }

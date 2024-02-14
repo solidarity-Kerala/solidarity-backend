@@ -1,4 +1,5 @@
 const { default: mongoose } = require("mongoose");
+const multer = require("multer");
 const Download = require("../models/download");
 
 // @desc      CREATE NEW DOWNLOAD

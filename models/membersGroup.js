@@ -13,8 +13,8 @@ const membersgroupSchema = new mongoose.Schema(
       ref: "Area",
     },
     status: {
-      type: Boolean,
-      default: true,
+      type: String,
+      enum: ["Present", "Absent", "Leave"],
     },
     district: {
       type: mongoose.Schema.Types.ObjectId,

@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const Members = require("../models/members");
-const Membersgroup = require("../models/membersGroup");
+const MemberGroup = require("../models/membersGroup");
 
 // @desc      CREATE NEW MEMBER
 // @route     POST /api/v1/members
@@ -222,44 +222,218 @@ exports.getMembersByArea = async (req, res) => {
   }
 };
 
+// exports.getMembersByMemberGroup = async (req, res) => {
+//   try {
+//     const { groupId } = req.query;
+
+//     if (!groupId || !mongoose.isValidObjectId(groupId)) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Invalid groupId provided.",
+//       });
+//     }
+
+//     const members = await Members.find({ groupId: groupId })
+//       .populate("memberStatus")
+//       .populate("designation")
+//       .populate("groupId");
+
+//     const group = await Membersgroup.findById(groupId);
+
+//     if (!group) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Members group not found.",
+//       });
+//     }
+
+//     const memberCount = await Members.countDocuments({ groupId: groupId });
+
+//     res.status(200).json({
+//       success: true,
+//       message: `Retrieved members for group: ${group.groupName}`,
+//       response: members,
+//       count: memberCount,
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({
+//       success: false,
+//       message: "An error occurred while processing the request.",
+//     });
+//   }
+// };
+
+
 exports.getMembersByMemberGroup = async (req, res) => {
   try {
-    const { groupId } = req.query;
+    console.log(req.query, "req.query");
+    const groupId = req.query.id; // Access 'id' from req.query
 
+    // Check if groupId is provided and valid
     if (!groupId || !mongoose.isValidObjectId(groupId)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid groupId provided.",
+        message: "Invalid member ID",
       });
     }
 
-    const members = await Members.find({ groupId: groupId })
-      .populate("memberStatus")
-      .populate("designation")
-      .populate("groupId");
+    // Find all group items for the specified group ID
+    const membersGroupDetails = await Members.find({ group: groupId }).populate("group");
 
-    const group = await Membersgroup.findById(groupId);
-
-    if (!group) {
+    // If no group items found, return 404
+    if (!membersGroupDetails || membersGroupDetails.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "Members group not found.",
+        message: "No group items found for the specified member ID",
       });
     }
 
-    const memberCount = await Members.countDocuments({ groupId: groupId });
-
+    // Return the group details
     res.status(200).json({
       success: true,
-      message: `Retrieved members for group: ${group.groupName}`,
-      response: members,
-      count: memberCount,
+      message: "Retrieved group items by member ID",
+      response: membersGroupDetails,
     });
   } catch (err) {
     console.error(err);
+    // Handle any unexpected errors
     res.status(500).json({
       success: false,
-      message: "An error occurred while processing the request.",
+      message: err.toString(),
+    });
+  }
+};
+
+exports.getMembersListByMemberGroup = async (req, res) => {
+  try {
+    const groupId = req.query.id; // Access 'id' from req.query
+
+    // Check if groupId is provided and valid
+    if (!groupId || !mongoose.isValidObjectId(groupId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid member group ID",
+      });
+    }
+
+    // Find all members for the specified group ID
+    const members = await Members.find({ group: groupId }).populate("group");
+
+    // If no members found, return 404
+    if (!members || members.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No members found for the specified member group ID",
+      });
+    }
+
+    // Initialize count variables
+    let activeMemberCount = 0;
+    let abroadMemberCount = 0;
+    let inactiveMemberCount = 0;
+
+    // Initialize list of members
+    let memberList = [];
+
+    // Calculate member counts and populate member list
+    members.forEach(member => {
+      if (member.group && member.group.status === true) { // Check if group status is true
+        activeMemberCount++;
+        if (member.isAbroad) {
+          abroadMemberCount++;
+        }
+        memberList.push(member);
+      } else {
+        inactiveMemberCount++;
+      }
+    });
+
+    // Return the member counts and member list
+    res.status(200).json({
+      success: true,
+      message: "Retrieved member details and counts by member group ID",
+      response: {
+        counts: {
+          active: activeMemberCount,
+          abroad: abroadMemberCount,
+          inactive: inactiveMemberCount
+        },
+        memberList: memberList
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    // Handle any unexpected errors
+    res.status(500).json({
+      success: false,
+      message: err.toString(),
+    });
+  }
+};
+
+exports.getReportByMemberGroup = async (req, res) => {
+  try {
+    const { month, year } = req.query; // Assuming month and year are provided in the query parameters
+
+    // Check if month and year are provided
+    if (!month || !year) {
+      return res.status(400).json({
+        success: false,
+        message: "Month and year are required parameters",
+      });
+    }
+
+    // Find member groups for the given month and year
+    const memberGroups = await MemberGroup.find({ month, year });
+
+    // Fetch members for each member group
+    let members = [];
+    for (const memberGroup of memberGroups) {
+      const membersInGroup = await Members.find({ memberGroup: memberGroup._id });
+      members = members.concat(membersInGroup);
+    }
+
+    // Initialize counts
+    let presentCount = 0;
+    let absentCount = 0;
+    let leaveCount = 0;
+
+    // Calculate counts
+    members.forEach(member => {
+      if (member.attendance.status === 'present') {
+        presentCount++;
+      } else if (member.attendance.status === 'absent') {
+        absentCount++;
+      } else if (member.attendance.status === 'leave') {
+        leaveCount++;
+      }
+    });
+
+    // Fetch meeting management data if needed
+
+    // Construct the report object
+    const report = {
+      month,
+      year,
+      presentCount,
+      absentCount,
+      leaveCount,
+      // Include meeting management data if needed
+    };
+
+    // Return the report
+    res.status(200).json({
+      success: true,
+      message: "Report generated successfully",
+      report
+    });
+  } catch (err) {
+    console.error(err);
+    // Handle any unexpected errors
+    res.status(500).json({
+      success: false,
+      message: err.toString(),
     });
   }
 };

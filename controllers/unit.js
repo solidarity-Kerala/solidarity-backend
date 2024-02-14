@@ -28,7 +28,7 @@ exports.getUnit = async (req, res) => {
   try {
     const { id, skip, limit, searchkey } = req.query;
 
-    if(id && mongoose.isValidObjectId(id)) {
+    if (id && mongoose.isValidObjectId(id)) {
       const unit = await Unit.findById(id);
       return res.status(200).json({
         success: true,
@@ -42,9 +42,11 @@ exports.getUnit = async (req, res) => {
       : req.filter;
 
     const [totalCount, filterCount, data] = await Promise.all([
-      parseInt(skip) === 0 &&Unit.countDocuments(),
-      parseInt(skip) === 0 &&Unit.countDocuments(query),
-     Unit.find(query)
+      parseInt(skip) === 0 && Unit.countDocuments(),
+      parseInt(skip) === 0 && Unit.countDocuments(query),
+      Unit.find(query)
+        .populate("memberGroup")
+        .populate("area")
         .skip(parseInt(skip) || 0)
         .limit(parseInt(limit) || 50)
         .sort({ _id: -1 }),
@@ -80,7 +82,7 @@ exports.updateUnit = async (req, res) => {
       }
     );
 
-    if(!unit) {
+    if (!unit) {
       return res.status(404).json({
         success: false,
         message: "Unit not found",
@@ -108,7 +110,7 @@ exports.deleteUnit = async (req, res) => {
   try {
     const unit = await Unit.findByIdAndDelete(req.query.id);
 
-    if(!unit) {
+    if (!unit) {
       return res.status(404).json({
         success: false,
         message: "Unit not found",

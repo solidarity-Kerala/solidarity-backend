@@ -8,6 +8,7 @@ const {
   select,
   getMembersByArea,
   getMembersByMemberGroup,
+  getMembersListByMemberGroup
 } = require("../controllers/members");
 
 // middleware
@@ -29,5 +30,6 @@ router.get("/select", reqFilter, select);
 router.get("/area", getMembersByArea);
 
 router.get("/member-by-membergroup", getMembersByMemberGroup);
+router.get("/memberlist-by-membergroup", getMembersListByMemberGroup);
 
 module.exports = router;
