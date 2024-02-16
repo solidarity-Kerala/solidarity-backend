@@ -13,11 +13,11 @@ const membersSchema = new mongoose.Schema(
       type: String,
     },
     mobileNumber: {
-      type: String,
+      type: Number,
     },
     bloodGroup: {
       type: String,
-      enum: ["A+","A-","B+","B-","AB+","AB-","O+","O-"],
+      enum: ["A+ve","A-ve","B+ve","B-ve","AB+ve","AB-ve","O+ve","O-ve"],
     },
     profession: {
       type: String,

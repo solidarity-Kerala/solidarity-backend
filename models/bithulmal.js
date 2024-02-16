@@ -4,9 +4,10 @@ const bithulmalSchema = new mongoose.Schema(
   {
     month: {
       type: String,
+      enum: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     },
-    paymentDate:{
-      type:Date,
+    paymentDate: {
+      type: Date,
     },
     member: {
       type: mongoose.Schema.Types.ObjectId,

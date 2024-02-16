@@ -4,20 +4,19 @@ const meetingSchema = new mongoose.Schema(
   {
     month: {
       type: String,
-      enum: ["January", "February","March","April","May","June","July","August","September","October","November","December"],
+      enum: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     },
-    Date:{
-     type:Date
+    date: {
+      type: Date
     },
     place: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "District",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "District",
     },
     attendance: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Attendance",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Attendance",
     },
-    
   },
   { timestamps: true }
 );
