@@ -12,6 +12,7 @@ const {
   getPresentAbsentMembersByMonth,
   getPresentAbsentMembersByMonthwithcount,
   getAttendanceByGroup,
+  getGroupOverallAttendance,
 } = require("../controllers/attendance");
 // middleware
 const { protect } = require("../middleware/auth");
@@ -34,5 +35,6 @@ router.get(
   getPresentAbsentMembersByMonthwithcount
 );
 router.get("/by-group", reqFilter, getAttendanceByGroup);
+router.get("/group-overall", reqFilter, getGroupOverallAttendance);
 
 module.exports = router;

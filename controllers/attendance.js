@@ -155,7 +155,7 @@ exports.getAttendanceReportByMemberGroup = async (req, res) => {
       ? { group: { $regex: searchkey, $options: "i" } }
       : {};
 
-    // Calculate total present and absent for each member group
+    // Calculate total present, absent, and leave for each member group
     const groupAttendances = await Attendance.aggregate([
       { $match: query },
       {
@@ -167,6 +167,15 @@ exports.getAttendanceReportByMemberGroup = async (req, res) => {
           totalAbsent: {
             $sum: { $cond: [{ $eq: ["$status", "Absent"] }, 1, 0] },
           },
+          totalLeave: {
+            $sum: { $cond: [{ $eq: ["$status", "Leave"] }, 1, 0] },
+          },
+          memberAttendance: {
+            $push: {
+              member: "$member",
+              status: "$status"
+            }
+          }
         },
       },
       {
@@ -187,6 +196,8 @@ exports.getAttendanceReportByMemberGroup = async (req, res) => {
           groupName: "$groupInfo.groupName",
           totalPresent: 1,
           totalAbsent: 1,
+          totalLeave: 1,
+          memberAttendance: 1
         },
       },
     ]);
@@ -482,6 +493,74 @@ exports.getAttendanceByGroup = async (req, res) => {
     res.status(400).json({
       success: false,
       message: err,
+    });
+  }
+};
+
+// @desc      GET GROUP OVERALL ATTENDANCE
+// @route     GET /api/v1/attendance/group-overall
+// @access    public
+exports.getGroupOverallAttendance = async (req, res) => {
+  try {
+    const { groupId, startDate, endDate } = req.query;
+
+    // Convert the startDate and endDate strings to JavaScript Date objects
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // Ensure that the endDate is greater than or equal to the startDate
+    if (start > end) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid date range. The end date should be greater than or equal to the start date.",
+      });
+    }
+
+    // Find the attendance records within the date range and for the specified group
+    const attendance = await Attendance.find({
+      group: groupId,
+      date: { $gte: start, $lte: end },
+    });
+
+    // Initialize counts for present, absent, and leave
+    let presentCount = 0;
+    let absentCount = 0;
+    let leaveCount = 0;
+
+    // Check each attendance record and count present, absent, and leave
+    attendance.forEach((record) => {
+      if (record.status === "Present") {
+        presentCount++;
+      } else if (record.status === "Absent") {
+        absentCount++;
+      } else if (record.status === "Leave") {
+        leaveCount++;
+      }
+    });
+
+    // Check if there's a meeting held in the current month
+    const isCurrentMonthMeetingHeld = await Attendance.exists({
+      group: groupId,
+      date: {
+        $gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+        $lte: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Group overall attendance retrieved successfully",
+      presentCount,
+      absentCount,
+      leaveCount,
+      isCurrentMonthMeetingHeld,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while processing the request.",
     });
   }
 };
