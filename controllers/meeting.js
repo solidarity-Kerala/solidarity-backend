@@ -144,3 +144,43 @@ exports.select = async (req, res) => {
     });
   }
 };
+
+/// @desc      CHECK IF MEETING HELD ON A SPECIFIC DATE AND RETURN MEETING DETAILS IF HELD, OTHERWISE RETURN CUSTOM MESSAGE
+// @route     GET /api/v1/meeting/check-held
+// @access    public
+exports.checkMeetingHeld = async (req, res) => {
+  try {
+    const { date } = req.query;
+
+    if (!date) {
+      return res.status(400).json({
+        success: false,
+        message: "Date parameter is required",
+      });
+    }
+
+    const meetingDate = new Date(date);
+    const month = meetingDate.toLocaleString('default', { month: 'long' });
+
+    const meetingOnDate = await Meeting.findOne({ date: { $eq: meetingDate }, month }).populate('place').populate('attendance');
+
+    if (meetingOnDate) {
+      return res.status(200).json({
+        success: true,
+        message: "Meeting held on the specified date",
+        data: meetingOnDate,
+      });
+    } else {
+      return res.status(200).json({
+        success: true,
+        message: "No meeting held on the specified date",
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({
+      success: false,
+      message: err.toString(),
+    });
+  }
+};

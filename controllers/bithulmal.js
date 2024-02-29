@@ -336,3 +336,31 @@ exports.sumBithumalAmount = async (req, res) => {
     });
   }
 };
+
+exports.getBithulmalByMemberGroupId = async (req, res) => {
+  try {
+    const group = req.query.group; // Assuming group is passed as a property in the request body
+
+    // Find Bithulmals with the given group
+    const bithulmals = await Bithulmal.find({ group: group }).populate('member').populate('group');
+
+    if (!bithulmals || bithulmals.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No Bithulmals found for the provided group',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Retrieved Bithulmals for group: ${group}`,
+      data: bithulmals,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({
+      success: false,
+      message: err.toString(),
+    });
+  }
+};

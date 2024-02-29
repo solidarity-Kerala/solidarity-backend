@@ -6,6 +6,7 @@ const {
   updateMeeting,
   deleteMeeting,
   select,
+  checkMeetingHeld,
 } = require("../controllers/meeting");
 // middleware
 const { protect, authorize } = require("../middleware/auth");
@@ -19,5 +20,6 @@ router
   .delete(deleteMeeting);
 
 router.get("/select", reqFilter, select);
+router.get("/check-meeting", reqFilter, checkMeetingHeld);
 
 module.exports = router;
