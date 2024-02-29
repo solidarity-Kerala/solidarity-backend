@@ -9,6 +9,7 @@ const {
   getBithulmalReportByMemberGroup,
   getAmountPaidByMemberInMemberGroup,
   sumBithumalAmount,
+  getBithulmalByMemberGroupId,
 } = require("../controllers/bithulmal");
 // middleware
 const { protect } = require("../middleware/auth");
@@ -28,4 +29,6 @@ router.get("/report", getBithulmalReport);
 router.get("/report/member-group", getBithulmalReportByMemberGroup);
 router.get("/amount-by-member-in-group", getAmountPaidByMemberInMemberGroup);
 router.get("/sum-bithulmal-amount", sumBithumalAmount);
+router.get("/bithulmal-membergroup", reqFilter, getBithulmalByMemberGroupId);
+
 module.exports = router;
