@@ -148,12 +148,20 @@ exports.deleteAttendance = async (req, res) => {
 // @access    public
 exports.getAttendanceReportByMemberGroup = async (req, res) => {
   try {
-    const { searchkey } = req.query;
+    const { searchkey, group } = req.query;
 
-    // Define and set the query based on the searchkey parameter if provided
-    const query = searchkey
-      ? { group: { $regex: searchkey, $options: "i" } }
-      : {};
+    // Define the base query
+    let query = {};
+
+    // If group parameter is provided, add it to the query
+    if (group && mongoose.isValidObjectId(group)) {
+      query.group = new mongoose.Types.ObjectId(group);
+    }
+
+    // If searchkey parameter is provided, add it to the query for additional filtering
+    if (searchkey) {
+      query.groupName = { $regex: searchkey, $options: "i" };
+    }
 
     // Calculate total present and absent for each member group
     const groupAttendances = await Attendance.aggregate([
@@ -205,6 +213,7 @@ exports.getAttendanceReportByMemberGroup = async (req, res) => {
     });
   }
 };
+
 
 exports.getAttendanceReportByMonth = async (req, res) => {
   try {
