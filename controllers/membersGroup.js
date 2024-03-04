@@ -1,25 +1,27 @@
 const { default: mongoose } = require("mongoose");
 const Membersgroup = require("../models/membersGroup");
 const Bithulmal = require("../models/bithulmal");
+const Members = require("../models/members");
+const memberStatus = require("../models/memberStatus");
 
 // @desc      CREATE NEW MEMBERS GROUP
 // @route     POST /api/v1/membersgroup
 // @access    protect
 exports.createMembersGroup = async (req, res) => {
-try {
-  const newMembersGroup = await Membersgroup.create(req.body);
-  res.status(200).json({
-    success: true,
-    message: "Member group created successfully",
-    data: newMembersGroup,
-  });
-} catch (err) {
-  console.log(err);
-  res.status(400).json({
-    success: false,
-    message: err,
-  });
-}
+  try {
+    const newMembersGroup = await Membersgroup.create(req.body);
+    res.status(200).json({
+      success: true,
+      message: "Member group created successfully",
+      data: newMembersGroup,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({
+      success: false,
+      message: err,
+    });
+  }
 };
 
 // @desc      GET ALL MEMBERS GROUPS
@@ -30,12 +32,34 @@ exports.getMembersGroups = async (req, res) => {
     const { id, skip, limit, searchkey } = req.query;
 
     if (id && mongoose.isValidObjectId(id)) {
+      // Fetch the specific member group
       const membersGroup = await Membersgroup.findById(id).populate("area");
-      return res.status(200).json({
-        success: true,
-        message: "Retrieved specific members group",
-        response: membersGroup,
-      });
+
+      // If member group is found, fetch members belonging to that group
+      if (membersGroup) {
+        const members = await Members.find({ group: id }).populate("unit").populate("designation").populate("memberStatus");
+        const membersCount = await Members.find({ group: id }).countDocuments();
+        
+        const activeStatus = await memberStatus.findOne({ status: "Active" });
+        const activeMembersCount = await Members.countDocuments({ group: id, memberStatus: activeStatus._id });
+
+        const inactiveStatus = await memberStatus.findOne({ status: "Inactive" });
+        const inactiveMembersCount = await Members.countDocuments({ group: id, memberStatus: inactiveStatus._id });
+        
+        const abroadStatus = await memberStatus.findOne({ status: "Abroad" });
+        const abroadMembersCount = await Members.countDocuments({ group: id, memberStatus: abroadStatus._id });
+
+        return res.status(200).json({
+          success: true,
+          message: "Retrieved specific members group",
+          response: { membersGroup, members, totalMembers: membersCount, activeMembers: activeMembersCount, inactiveMembers: inactiveMembersCount, abroadMembers: abroadMembersCount }, // Include both members group info and members
+        });
+      } else {
+        return res.status(404).json({
+          success: false,
+          message: "Member group not found",
+        });
+      }
     }
 
     const query = searchkey
