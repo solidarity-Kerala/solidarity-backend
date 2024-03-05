@@ -7,12 +7,17 @@ const Attendance = require("../models/attendance");
 // @access    protect
 exports.createMeeting = async (req, res) => {
   try {
+    console.log(req.body);
+    const membersAttendance = req.body.members.map(member => ({
+      member: member.member,
+      status: member.status
+    }));
+
     const newAttendance = await Attendance.create({
       date: Date.now(), // or use Date.now(), if you want to set the current date
       place: req.body.place,
       group: req.body.group,
-      member: req.body.member, // Ensure this is provided in req.body
-      status: req.body.status, // or based on actual status, ensure this logic matches your needs
+      members: membersAttendance, // Update to use membersAttendance array
       month: req.body.month,
     });
 
@@ -61,9 +66,12 @@ exports.getMeeting = async (req, res) => {
 
     // Adjust query based on monthCount
     if (monthCount && !isNaN(monthCount)) {
+      const count = monthCount - 1
       const end = new Date(); // Today's date for reference
-      const start = new Date(new Date().setMonth(end.getMonth() - parseInt(monthCount)));
+      const start = new Date(new Date().setMonth(end.getMonth() - parseInt(count)));
 
+      console.log(`Start: ${start}`);
+      console.log(`End: ${end}`);
       // Ensure the start date is set to the first day of the month at 00:00:00 hours
       start.setDate(1); // First day of the start month
       start.setHours(0, 0, 0, 0); // Start of the day
@@ -79,7 +87,11 @@ exports.getMeeting = async (req, res) => {
       parseInt(skip) === 0 && Meeting.countDocuments(query),
       Meeting.find(query)
         .populate("place")
-        .populate("attendance")
+        .populate({
+          path: "attendance",
+          populate: { path: "members.member", model: "Member" },
+          options: { strictPopulate: false }
+        })
         .populate("group")
         .skip(parseInt(skip) || 0)
         .limit(parseInt(limit) || 0)
