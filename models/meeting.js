@@ -7,7 +7,12 @@ const meetingSchema = new mongoose.Schema(
       enum: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     },
     date: {
-      type: Date
+      type: Date,
+      default: Date.now,
+    },
+    group: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Membersgroup",
     },
     place: {
       type: mongoose.Schema.Types.ObjectId,
