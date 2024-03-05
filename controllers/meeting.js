@@ -1,12 +1,26 @@
 const { default: mongoose } = require("mongoose");
 const Meeting = require("../models/meeting");
+const Attendance = require("../models/attendance");
 
 // @desc      CREATE NEW MEETING
 // @route     POST /api/v1/meeting
 // @access    protect
 exports.createMeeting = async (req, res) => {
   try {
-    const newMeeting = await Meeting.create(req.body);
+    const newAttendance = await Attendance.create({
+      date: Date.now(), // or use Date.now(), if you want to set the current date
+      place: req.body.place,
+      group: req.body.group,
+      member: req.body.member, // Ensure this is provided in req.body
+      status: req.body.status, // or based on actual status, ensure this logic matches your needs
+      month: req.body.month,
+    });
+
+    // Now create the meeting with the newAttendance._id included
+    const newMeeting = await Meeting.create({
+      ...req.body,
+      attendance: newAttendance._id, // Add the attendance ID to the meeting
+    });
     res.status(200).json({
       success: true,
       message: "Meeting created successfully",
@@ -26,7 +40,7 @@ exports.createMeeting = async (req, res) => {
 // @access    public
 exports.getMeeting = async (req, res) => {
   try {
-    const { id, skip, limit, searchkey } = req.query;
+    const { id, skip, limit, searchkey, group } = req.query;
 
     if (id && mongoose.isValidObjectId(id)) {
       const response = await Meeting.findById(id);
@@ -37,18 +51,23 @@ exports.getMeeting = async (req, res) => {
       });
     }
 
-    const query = searchkey
-      ? { ...req.filter, month: { $regex: searchkey, $options: "i" } }
-      : req.filter;
+    let query = {};
+    if (group && mongoose.isValidObjectId(group)) {
+      query.group = group; // Filter by group
+    }
+    if (searchkey) {
+      query.month = { $regex: searchkey, $options: "i" }; // Add search by month
+    }
 
     const [totalCount, filterCount, data] = await Promise.all([
       parseInt(skip) === 0 && Meeting.countDocuments(),
       parseInt(skip) === 0 && Meeting.countDocuments(query),
       Meeting.find(query)
-      .populate("place")
-      .populate("attendance")
+        .populate("place")
+        .populate("attendance")
+        .populate("group")
         .skip(parseInt(skip) || 0)
-        .limit(parseInt(limit) || 50)
+        .limit(parseInt(limit) || 0)
         .sort({ _id: -1 }),
     ]);
 
@@ -160,9 +179,14 @@ exports.checkMeetingHeld = async (req, res) => {
     }
 
     const meetingDate = new Date(date);
-    const month = meetingDate.toLocaleString('default', { month: 'long' });
+    const month = meetingDate.toLocaleString("default", { month: "long" });
 
-    const meetingOnDate = await Meeting.findOne({ date: { $eq: meetingDate }, month }).populate('place').populate('attendance');
+    const meetingOnDate = await Meeting.findOne({
+      date: { $eq: meetingDate },
+      month,
+    })
+      .populate("place")
+      .populate("attendance");
 
     if (meetingOnDate) {
       return res.status(200).json({
