@@ -8,9 +8,9 @@ const Attendance = require("../models/attendance");
 exports.createMeeting = async (req, res) => {
   try {
     console.log(req.body);
-    const membersAttendance = req.body.members.map(member => ({
+    const membersAttendance = req.body.members.map((member) => ({
       member: member.member,
-      status: member.status
+      status: member.status,
     }));
 
     const newAttendance = await Attendance.create({
@@ -48,7 +48,14 @@ exports.getMeeting = async (req, res) => {
     const { id, skip, limit, searchkey, group, monthCount } = req.query;
 
     if (id && mongoose.isValidObjectId(id)) {
-      const response = await Meeting.findById(id);
+      const response = await Meeting.findById(id)
+        .populate("place")
+        .populate({
+          path: "attendance",
+          populate: { path: "members.member", model: "Member" },
+          options: { strictPopulate: false },
+        })
+        .populate("group");
       return res.status(200).json({
         success: true,
         message: "Retrieved specific Meeting",
@@ -66,9 +73,11 @@ exports.getMeeting = async (req, res) => {
 
     // Adjust query based on monthCount
     if (monthCount && !isNaN(monthCount)) {
-      const count = monthCount - 1
+      const count = monthCount - 1;
       const end = new Date(); // Today's date for reference
-      const start = new Date(new Date().setMonth(end.getMonth() - parseInt(count)));
+      const start = new Date(
+        new Date().setMonth(end.getMonth() - parseInt(count))
+      );
 
       console.log(`Start: ${start}`);
       console.log(`End: ${end}`);
@@ -90,7 +99,7 @@ exports.getMeeting = async (req, res) => {
         .populate({
           path: "attendance",
           populate: { path: "members.member", model: "Member" },
-          options: { strictPopulate: false }
+          options: { strictPopulate: false },
         })
         .populate("group")
         .skip(parseInt(skip) || 0)
