@@ -40,7 +40,7 @@ exports.createMeeting = async (req, res) => {
 // @access    public
 exports.getMeeting = async (req, res) => {
   try {
-    const { id, skip, limit, searchkey, group } = req.query;
+    const { id, skip, limit, searchkey, group, monthCount } = req.query;
 
     if (id && mongoose.isValidObjectId(id)) {
       const response = await Meeting.findById(id);
@@ -57,6 +57,21 @@ exports.getMeeting = async (req, res) => {
     }
     if (searchkey) {
       query.month = { $regex: searchkey, $options: "i" }; // Add search by month
+    }
+
+    // Adjust query based on monthCount
+    if (monthCount && !isNaN(monthCount)) {
+      const end = new Date(); // Today's date for reference
+      const start = new Date(new Date().setMonth(end.getMonth() - parseInt(monthCount)));
+
+      // Ensure the start date is set to the first day of the month at 00:00:00 hours
+      start.setDate(1); // First day of the start month
+      start.setHours(0, 0, 0, 0); // Start of the day
+
+      // Optionally adjust end date to the end of the current month
+      // Not necessary if you're looking to include all up to the current date/time
+
+      query.date = { $gte: start, $lt: end }; // Meetings within the start to end date range
     }
 
     const [totalCount, filterCount, data] = await Promise.all([
