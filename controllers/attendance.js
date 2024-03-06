@@ -87,14 +87,11 @@ exports.getAttendances = async (req, res) => {
 // @access    protect
 exports.updateAttendance = async (req, res) => {
   try {
-    const attendance = await Attendance.findByIdAndUpdate(
-      req.body.id,
-      req.body,
-      {
-        new: true,
-      }
-    );
-
+    const id = req.body.id;
+    const updateData = req.body;
+    // Find the attendance record by ID
+    const attendance = await Attendance.findById(id);
+    
     if (!attendance) {
       return res.status(404).json({
         success: false,
@@ -102,10 +99,30 @@ exports.updateAttendance = async (req, res) => {
       });
     }
 
+    // Update existing members' status and add new members if they don't exist
+    updateData.members.forEach((updateMember) => {
+      const existingMember = attendance.members.find(member => 
+        member.member.equals(updateMember.member)
+      );
+
+      if (existingMember) {
+        // Update existing member's status
+        existingMember.status = updateMember.status;
+      } else {
+        // Add new member to the attendance
+        attendance.members.push({
+          member: updateMember.member,
+          status: updateMember.status,
+        });
+      }
+    });
+
+    // Save the updated attendance
+    const updatedAttendance = await attendance.save();
     res.status(200).json({
       success: true,
       message: "Attendance updated successfully",
-      data: attendance,
+      data: updatedAttendance,
     });
   } catch (err) {
     console.log(err);
