@@ -47,6 +47,8 @@ exports.getMeeting = async (req, res) => {
   try {
     const { id, skip, limit, searchkey, group, monthCount } = req.query;
 
+    let totalStatusCounts = { Present: 0, Absent: 0, Leave: 0 }; // Initialize total status counts
+
     if (id && mongoose.isValidObjectId(id)) {
       const response = await Meeting.findById(id)
         .populate("place")
