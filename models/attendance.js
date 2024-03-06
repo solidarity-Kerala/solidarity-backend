@@ -20,6 +20,7 @@ const attendanceSchema = new mongoose.Schema(
         status: {
           type: String,
           enum: ["Present", "Absent", "Leave"],
+          default: "Absent",
         },
       },
     ],
@@ -45,15 +46,14 @@ const attendanceSchema = new mongoose.Schema(
 );
 
 // Virtual field for status counts
-attendanceSchema.virtual('statusCounts').get(function() {
+attendanceSchema.virtual("statusCounts").get(function () {
   const statusCounts = { Present: 0, Absent: 0, Leave: 0 };
-  this.members.forEach(member => {
+  this.members.forEach((member) => {
     if (statusCounts[member.status] !== undefined) {
       statusCounts[member.status]++;
     }
   });
   return statusCounts;
 });
-
 
 module.exports = mongoose.model("Attendance", attendanceSchema);

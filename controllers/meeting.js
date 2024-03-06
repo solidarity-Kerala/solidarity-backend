@@ -8,24 +8,39 @@ const Attendance = require("../models/attendance");
 exports.createMeeting = async (req, res) => {
   try {
     console.log(req.body);
+
+    // Check if a meeting already exists for the provided date
+    const existingMeeting = await Meeting.findOne({ date: req.body.date });
+
+    if (existingMeeting) {
+      return res.status(400).json({
+        success: false,
+        message: "A meeting already exists for this date",
+      });
+    }
+
     const membersAttendance = req.body.members.map((member) => ({
       member: member.member,
       status: member.status,
     }));
 
     const newAttendance = await Attendance.create({
-      date: Date.now(), // or use Date.now(), if you want to set the current date
+      date: req.body.date,
       place: req.body.place,
       group: req.body.group,
-      members: membersAttendance, // Update to use membersAttendance array
+      members: membersAttendance,
       month: req.body.month,
     });
 
-    // Now create the meeting with the newAttendance._id included
+    console.log({ newAttendance });
+    
     const newMeeting = await Meeting.create({
       ...req.body,
-      attendance: newAttendance._id, // Add the attendance ID to the meeting
+      attendance: newAttendance._id,
     });
+    
+    console.log({ newMeeting });
+
     res.status(200).json({
       success: true,
       message: "Meeting created successfully",
