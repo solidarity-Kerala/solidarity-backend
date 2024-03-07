@@ -160,6 +160,46 @@ exports.deleteAttendance = async (req, res) => {
   }
 };
 
+exports.getMemberAttendance = async (req, res) => {
+  try {
+    const { groupId, memberId } = req.query;
+
+    // Validate group and member IDs
+    if (!mongoose.isValidObjectId(groupId) || !mongoose.isValidObjectId(memberId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid group or member ID",
+      });
+    }
+
+    // Find attendance data for the specified group and member
+    const attendanceData = await Attendance.find({
+      group: groupId,
+      "members.member": memberId,
+    });
+
+    // Format the response with required fields
+    const formattedResponse = attendanceData.map((attendance) => ({
+      month: attendance.month,
+      date: attendance.date,
+      status: attendance.members.find((member) => member.member.toString() === memberId).status,
+    }));
+
+    res.status(200).json({
+      success: true,
+      message: `Retrieved specific attendance by member`,
+      response: formattedResponse,
+      count: formattedResponse.length,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
 // @desc      GET Attendance Report by Member Group
 // @route     GET /api/v1/attendance/report/membergroup
 // @access    public

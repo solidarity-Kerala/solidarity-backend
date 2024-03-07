@@ -12,6 +12,7 @@ const {
   getPresentAbsentMembersByMonth,
   getPresentAbsentMembersByMonthwithcount,
   getAttendanceByGroup,
+  getMemberAttendance,
 } = require("../controllers/attendance");
 // middleware
 const { protect } = require("../middleware/auth");
@@ -26,7 +27,7 @@ router
 
 router.get("/report/member-group", getAttendanceReportByMemberGroup);
 router.get("/report/month", getAttendanceReportByMonth);
-router.get("/attendance-by-member", getAttendanceByMember);
+router.get("/attendance-by-member", getMemberAttendance);
 router.get("/present-absent-members", getPresentAbsentMembersByMonth);
 router.get(
   "/present-absent-members-count",
