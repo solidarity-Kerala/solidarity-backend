@@ -228,6 +228,47 @@ exports.deleteBithulmal = async (req, res) => {
   }
 };
 
+exports.getMemberBithulmal = async (req, res) => {
+  try {
+    const { groupId, memberId } = req.query;
+
+    // Validate group and member IDs
+    if (!mongoose.isValidObjectId(groupId) || !mongoose.isValidObjectId(memberId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid group or member ID",
+      });
+    }
+
+    // Find bithulmal data for the specified group and member
+    const bithulmalData = await Bithulmal.find({
+      group: groupId,
+      "members.member": memberId,
+    });
+
+    // Format the response with required fields
+    const formattedResponse = bithulmalData.map((bithulmal) => ({
+      month: bithulmal.month,
+      date: bithulmal.date,
+      status: bithulmal.members.find((member) => member.member.toString() === memberId).status,
+      amountPaid: bithulmal.members.find((member) => member.member.toString() === memberId).amountPaid,
+    }));
+
+    res.status(200).json({
+      success: true,
+      message: `Retrieved Bithulmal data for member ${memberId} in group ${groupId}`,
+      response: formattedResponse,
+      count: formattedResponse.length,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
 // @desc      GET Bithulmal
 // @route     GET /api/v1/bithulmal/select
 // @access    protect
