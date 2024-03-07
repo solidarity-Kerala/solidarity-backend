@@ -25,78 +25,142 @@ exports.createBithulmal = async (req, res) => {
 // @desc      GET ALL BITHULMALS
 // @route     GET /api/v1/bithulmals
 // @access    public
+// exports.getBithulmals = async (req, res) => {
+//   try {
+//     const { id, skip, limit, searchkey } = req.query;
+
+//     if (id && mongoose.isValidObjectId(id)) {
+//       const bithulmal = await Bithulmal.findById(id)
+//         .populate("member")
+//         .populate("group");
+//       return res.status(200).json({
+//         success: true,
+//         message: "Retrieved specific bithulmal",
+//         response: bithulmal,
+//       });
+//     }
+//     let query;
+//     query = searchkey
+//       ? { ...req.filter, month: { $regex: searchkey, $options: "i" } }
+//       : req.filter;
+
+//     if (req.query?.startDate && req.query?.startDate) {
+//       query = {
+//         month: {
+//           $gte: req.query?.startDate,
+//           $lte: req.query?.endDate,
+//         },
+//       };
+//     }
+
+//     if (req.query?.month) {
+//       const selectedMonth = new Date(req.query.month);
+//       const startOfMonth = new Date(
+//         selectedMonth.getFullYear(),
+//         selectedMonth.getMonth(),
+//         1
+//       );
+//       const endOfMonth = new Date(
+//         selectedMonth.getFullYear(),
+//         selectedMonth.getMonth() + 1,
+//         0
+//       );
+
+//       query = {
+//         month: {
+//           $gte: startOfMonth,
+//           $lte: endOfMonth,
+//         },
+//       };
+//     }
+
+//     const [totalCount, filterCount, data] = await Promise.all([
+//       parseInt(skip) === 0 && Bithulmal.countDocuments(),
+//       parseInt(skip) === 0 && Bithulmal.countDocuments(query),
+//       Bithulmal.find(query)
+//         .populate("member")
+//         .populate("group")
+//         .skip(parseInt(skip) || 0)
+//         .limit(parseInt(limit) || 50)
+//         .sort({ _id: -1 }),
+//     ]);
+
+//     const sumAmountPaid = data.reduce((acc, current) => {
+//       return acc + parseFloat(current.amountPaid || 0);
+//     }, 0);
+
+//     res.status(200).json({
+//       success: true,
+//       message: `Retrieved all bithulmals`,
+//       response: data,
+//       count: data.length,
+//       totalCount: totalCount || 0,
+//       filterCount: filterCount || 0,
+//       paidAmount: sumAmountPaid,
+//     });
+//   } catch (err) {
+//     console.log(err);
+//     res.status(400).json({
+//       success: false,
+//       message: err.toString(),
+//     });
+//   }
+// };
+
+// ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,, //
+
 exports.getBithulmals = async (req, res) => {
   try {
-    const { id, skip, limit, searchkey } = req.query;
+    const { id, skip, limit, searchkey, group, monthCount } = req.query;
 
     if (id && mongoose.isValidObjectId(id)) {
-      const bithulmal = await Bithulmal.findById(id)
-        .populate("member")
-        .populate("group");
+      const response = await Bithulmal.findById(id)
+        .populate("group")
+        .populate("members.member");
       return res.status(200).json({
         success: true,
-        message: "Retrieved specific bithulmal",
-        response: bithulmal,
+        message: "Retrieved specific Bithulmal",
+        response,
       });
     }
-    let query;
-    query = searchkey
-      ? { ...req.filter, month: { $regex: searchkey, $options: "i" } }
-      : req.filter;
 
-    if (req.query?.startDate && req.query?.startDate) {
-      query = {
-        month: {
-          $gte: req.query?.startDate,
-          $lte: req.query?.endDate,
-        },
-      };
+    let query = {};
+    if (group && mongoose.isValidObjectId(group)) {
+      query.group = group; // Filter by group
+    }
+    if (searchkey) {
+      query.month = { $regex: searchkey, $options: "i" }; // Add search by month
     }
 
-    if (req.query?.month) {
-      const selectedMonth = new Date(req.query.month);
-      const startOfMonth = new Date(
-        selectedMonth.getFullYear(),
-        selectedMonth.getMonth(),
-        1
-      );
-      const endOfMonth = new Date(
-        selectedMonth.getFullYear(),
-        selectedMonth.getMonth() + 1,
-        0
-      );
 
-      query = {
-        month: {
-          $gte: startOfMonth,
-          $lte: endOfMonth,
-        },
-      };
+    // Adjust query based on monthCount
+    if (monthCount && !isNaN(monthCount)) {
+      const count = monthCount - 1;
+      const today = new Date();
+      const start = new Date(today.getFullYear(), today.getMonth() - count, 1);
+      const end = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59);
+
+      query.date = { $gte: start, $lte: end };
     }
 
     const [totalCount, filterCount, data] = await Promise.all([
       parseInt(skip) === 0 && Bithulmal.countDocuments(),
       parseInt(skip) === 0 && Bithulmal.countDocuments(query),
       Bithulmal.find(query)
-        .populate("member")
         .populate("group")
+        .populate("members.member")
         .skip(parseInt(skip) || 0)
-        .limit(parseInt(limit) || 50)
+        .limit(parseInt(limit) || 0)
         .sort({ _id: -1 }),
     ]);
 
-    const sumAmountPaid = data.reduce((acc, current) => {
-      return acc + parseFloat(current.amountPaid || 0);
-    }, 0);
-
     res.status(200).json({
       success: true,
-      message: `Retrieved all bithulmals`,
+      message: `Retrieved all Bithulmal`,
       response: data,
       count: data.length,
       totalCount: totalCount || 0,
       filterCount: filterCount || 0,
-      paidAmount: sumAmountPaid,
     });
   } catch (err) {
     console.log(err);
