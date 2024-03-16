@@ -102,9 +102,9 @@ exports.updateAbout = async (req, res) => {
 // @access    protect
 exports.deleteAbout = async (req, res) => {
   try {
-    const About = await About.findByIdAndDelete(req.query.id);
+    const about = await About.findByIdAndDelete(req.query.id);
 
-    if (!About) {
+    if (!about) {
       return res.status(404).json({
         success: false,
         message: "About not found",
