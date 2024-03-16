@@ -14,9 +14,12 @@ const meetingSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Membersgroup",
     },
+    // place: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "District",
+    // },
     place: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "District",
+      type: String,
     },
     attendance: {
       type: mongoose.Schema.Types.ObjectId,
