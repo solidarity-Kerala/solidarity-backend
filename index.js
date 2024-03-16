@@ -65,6 +65,7 @@ const designation = require("./routes/designation.js");
 const unit = require('./routes/unit.js');
 const download = require("./routes/download.js");
 const meeting = require("./routes/meeting.js");
+const about = require("./routes/about.js");
 // mount routers
 app.use("/api/V1/auth", auth);
 app.use("/api/v1/user", user);
@@ -89,6 +90,7 @@ app.use("/api/v1/designation", designation);
 app.use("/api/v1/unit", unit);
 app.use("/api/v1/download", download);
 app.use("/api/v1/meeting", meeting);
+app.use("/api/v1/about", about);
 // app.use("/api/v1/present-absent-members-count",presentAbsentMembersByMonthwithcount):
 
 const PORT = process.env.PORT || 8085;
