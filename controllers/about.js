@@ -29,7 +29,7 @@ exports.getAbouts = async (req, res) => {
     const { id, skip, limit, searchkey } = req.query;
 
     if (id && mongoose.isValidObjectId(id)) {
-      const About = await About.findById(id).populate("district");
+      const About = await About.findById(id);
       return res.status(200).json({
         success: true,
         message: "Retrieved specific About",
@@ -45,7 +45,6 @@ exports.getAbouts = async (req, res) => {
       parseInt(skip) === 0 && About.countDocuments(),
       parseInt(skip) === 0 && About.countDocuments(query),
       About.find(query)
-        .populate("district")
         .skip(parseInt(skip) || 0)
         .limit(parseInt(limit) || 50)
         .sort({ _id: -1 }),
