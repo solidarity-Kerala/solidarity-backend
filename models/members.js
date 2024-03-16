@@ -6,8 +6,7 @@ const membersSchema = new mongoose.Schema(
       type: String,
     },
     unit:{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Unit",
+      type: String,
     },
     address: {
       type: String,

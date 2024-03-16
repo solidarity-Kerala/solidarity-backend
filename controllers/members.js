@@ -10,7 +10,7 @@ exports.createMember = async (req, res) => {
     // const newMember = await Members.create({ ...req.body, userType: "Member" });
     const newMember = await Members.create({
       name: req.body?.name,
-      // unit: req.body?.unit,
+      unit: req.body?.unit,
       address: req.body?.name,
       mobileNumber: req.body?.mobileNumber,
       bloodGroup: req.body?.bloodGroup,
@@ -48,10 +48,10 @@ exports.getMembers = async (req, res) => {
 
     if (id && mongoose.isValidObjectId(id)) {
       const member = await Members.findById(id)
-        // .populate("memberStatus")
+        .populate("memberStatus")
         .populate("designation")
         .populate("group")
-        .populate("unit");
+        // .populate("unit");
       return res.status(200).json({
         success: true,
         message: "Retrieved specific member",
@@ -70,7 +70,7 @@ exports.getMembers = async (req, res) => {
         .populate("memberStatus")
         .populate("designation")
         .populate("group")
-        .populate("unit")
+        // .populate("unit")
         .skip(parseInt(skip) || 0)
         .limit(parseInt(limit) || 50)
         .sort({ _id: -1 }),
