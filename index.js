@@ -13,6 +13,7 @@ const allowedOrigins = [
   "http://localhost:3001",
   "https://gentle-forest-0ff497700.3.azurestaticapps.net",
   "https://solidarity-cms-szb9l.ondigitalocean.app",
+  "https://solidarity-cms-new-f9x8i.ondigitalocean.app",
 ];
 
 //cors policy
@@ -62,7 +63,7 @@ const attendance = require("./routes/attendance.js");
 const bithulmal = require("./routes/bithulmal.js");
 const notifications = require("./routes/notification.js");
 const designation = require("./routes/designation.js");
-const unit = require('./routes/unit.js');
+const unit = require("./routes/unit.js");
 const download = require("./routes/download.js");
 const meeting = require("./routes/meeting.js");
 const about = require("./routes/about.js");
