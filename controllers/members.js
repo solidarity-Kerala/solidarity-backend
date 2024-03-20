@@ -17,7 +17,7 @@ exports.createMember = async (req, res) => {
       profession: req.body?.profession,
       qualification: req.body?.qualification,
       areaOfInterest: req.body?.mobileNumber,
-      birthulmal: req.body?.birthulmal,
+      bithulmal: req.body?.bithulmal,
       dob: req.body?.dob,
       memberStatus: req.body?.memberStatus,
       designation: req.body?.designation || null,
