@@ -30,7 +30,6 @@ exports.count = async (req, res) => {
       District.countDocuments(),
       Members.countDocuments(),
       Membersgroup.countDocuments(),
-
     ]);
     console.log("count", areaCount);
 
@@ -89,39 +88,139 @@ exports.count = async (req, res) => {
 // @desc      GET PATIENT COUNTS FOR DASHBOARED
 // @route     GET /api/v1/dashboard/dietitian
 // @access    protect
-exports.patientCount = async (req, res) => {
+// exports.patientCount = async (req, res) => {
+//   try {
+//     const pipeline = [
+//       {
+//         $match: {
+//           dietician: new mongoose.Types.ObjectId(req.query.dietitian),
+//         },
+//       },
+//       {
+//         $group: {
+//           _id: null,
+//           patients: { $sum: 1 },
+//           admittedPatients: {
+//             $sum: {
+//               $cond: [{ $ne: ["$admissionDate", null] }, 1, 0],
+//             },
+//           },
+//         },
+//       },
+//     ];
+
+//     const result = await Appointment.aggregate(pipeline);
+
+//     const { patients, admittedPatients } = result[0];
+
+//     res.status(200).json({
+//       patients,
+//       admittedPatients,
+//     });
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).json({
+//       message: "Internal server error",
+//     });
+//   }
+// };
+
+// @desc      GET REPORT DATA
+// @route     GET /api/v1/dashboard/report
+// @access    protect
+
+exports.report = async (req, res) => {
+  console.log("req.query", req.query);
+  const { month, district } = req.query;
+
   try {
-    const pipeline = [
+    // Find the district ObjectId based on district name
+    let districtFilter = {};
+    if (district) {
+      const districtObj = await District.findOne({ districtName: district });
+      if (districtObj) {
+        // Filter groups by the found district ObjectId
+        const groupIdsInDistrict = await Membersgroup.find({
+          district: districtObj._id,
+        }).select("_id");
+        districtFilter = {
+          group: { $in: groupIdsInDistrict.map((g) => g._id) },
+        };
+      }
+    }
+
+    // Determine the month filter; use current month if not specified
+    let monthFilter = {};
+    if (month) {
+      monthFilter = { month: month };
+    } else {
+      const currentMonth = new Date().toLocaleString("default", {
+        month: "long",
+      });
+      monthFilter = { month: currentMonth };
+    }
+
+    const aggregateQuery = [
+      { $match: { ...monthFilter, ...districtFilter } },
+      { $unwind: "$members" },
       {
-        $match: {
-          dietician: new mongoose.Types.ObjectId(req.query.dietitian),
+        $group: {
+          _id: { month: "$month", group: "$group" },
+          totalAmount: {
+            $sum: {
+              $convert: {
+                input: "$members.amountPaid",
+                to: "decimal",
+                onError: 0,
+              },
+            },
+          },
+          count: { $sum: 1 },
         },
       },
       {
-        $group: {
-          _id: null,
-          patients: { $sum: 1 },
-          admittedPatients: {
-            $sum: {
-              $cond: [{ $ne: ["$admissionDate", null] }, 1, 0],
-            },
-          },
+        $lookup: {
+          from: "membersgroups",
+          localField: "_id.group",
+          foreignField: "_id",
+          as: "groupDetails",
+        },
+      },
+      { $unwind: "$groupDetails" },
+      {
+        $lookup: {
+          from: "districts",
+          localField: "groupDetails.district",
+          foreignField: "_id",
+          as: "districtDetails",
+        },
+      },
+      { $unwind: "$districtDetails" },
+      {
+        $project: {
+          month: "$_id.month",
+          group: "$groupDetails.groupName",
+          district: "$districtDetails.districtName",
+          totalAmount: 1,
+          count: 1,
         },
       },
     ];
 
-    const result = await Appointment.aggregate(pipeline);
+    const oData = await Bithulmal.aggregate(aggregateQuery);
 
-    const { patients, admittedPatients } = result[0];
-
-    res.status(200).json({
-      patients,
-      admittedPatients,
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: "Internal server error",
-    });
+    // Assuming 'data' is the result from the aggregation query
+    const data = oData.map((item) => ({
+      ...item,
+      totalAmount: item.totalAmount.toString(), // Convert Decimal128 to string
+      count: item.count,
+      month: item.month,
+      group: item.group,
+      district: item.district,
+    }));
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching report data:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
