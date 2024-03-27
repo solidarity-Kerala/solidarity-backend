@@ -9,6 +9,8 @@ const Membersgroup = require("../models/membersGroup");
 // const Associates = require("../models/associates");
 const moment = require("moment");
 const { default: mongoose } = require("mongoose");
+const members = require("../models/members");
+const { group } = require("console");
 
 // @desc      GET COUNTS FOR DASHBOARED
 // @route     GET /api/v1/dashboard
@@ -31,7 +33,7 @@ exports.count = async (req, res) => {
       Members.countDocuments(),
       Membersgroup.countDocuments(),
     ]);
-    console.log("count", areaCount);
+    // console.log("count", areaCount);
 
     res.status(200).json([
       {
@@ -85,52 +87,12 @@ exports.count = async (req, res) => {
   }
 };
 
-// @desc      GET PATIENT COUNTS FOR DASHBOARED
-// @route     GET /api/v1/dashboard/dietitian
-// @access    protect
-// exports.patientCount = async (req, res) => {
-//   try {
-//     const pipeline = [
-//       {
-//         $match: {
-//           dietician: new mongoose.Types.ObjectId(req.query.dietitian),
-//         },
-//       },
-//       {
-//         $group: {
-//           _id: null,
-//           patients: { $sum: 1 },
-//           admittedPatients: {
-//             $sum: {
-//               $cond: [{ $ne: ["$admissionDate", null] }, 1, 0],
-//             },
-//           },
-//         },
-//       },
-//     ];
-
-//     const result = await Appointment.aggregate(pipeline);
-
-//     const { patients, admittedPatients } = result[0];
-
-//     res.status(200).json({
-//       patients,
-//       admittedPatients,
-//     });
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({
-//       message: "Internal server error",
-//     });
-//   }
-// };
-
 // @desc      GET REPORT DATA
 // @route     GET /api/v1/dashboard/report
 // @access    protect
 
 exports.report = async (req, res) => {
-  console.log("req.query", req.query);
+  // console.log("req.query", req.query);
   const { month, district } = req.query;
 
   try {
@@ -221,6 +183,118 @@ exports.report = async (req, res) => {
     res.json(data);
   } catch (error) {
     console.error("Error fetching report data:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// @desc      GET MEMBERS DATA
+// @route     GET /api/v1/dashboard/members
+// @access    protect
+
+exports.members = async (req, res) => {
+  console.log("req.query", req.query);
+  const { district } = req.query;
+
+  try {
+    let filter = {};
+    if (district) {
+      // First, find the District document by name
+      const districtDoc = await District.findOne({
+        districtName: district,
+      }).exec();
+      if (districtDoc) {
+        // Then, find the Membersgroup document using the found district ObjectId
+        const membersGroup = await Membersgroup.findOne({
+          district: districtDoc._id,
+        }).exec();
+        console.log({ membersGroup });
+        if (membersGroup) {
+          filter.group = membersGroup._id;
+        } else {
+          return res.json({
+            message: "No members group found for the specified district",
+            data: [],
+          });
+        }
+      } else {
+        return res.json({
+          message: "No district found with the specified name",
+          data: [],
+        });
+      }
+    }
+
+    const aggregation = [
+      { $match: filter },
+      {
+        $lookup: {
+          from: "memberstatuses",
+          localField: "memberStatus",
+          foreignField: "_id",
+          as: "memberStatusDetails",
+        },
+      },
+      { $unwind: "$memberStatusDetails" },
+      {
+        $lookup: {
+          from: "membersgroups",
+          localField: "group",
+          foreignField: "_id",
+          as: "groupDetails",
+        },
+      },
+      { $unwind: "$groupDetails" },
+      {
+        $group: {
+          _id: {
+            status: "$memberStatusDetails.status",
+            groupName: "$groupDetails.groupName",
+          },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.groupName",
+          statuses: {
+            $push: {
+              status: "$_id.status",
+              count: "$count",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          groupName: "$_id",
+          statuses: "$statuses",
+        },
+      },
+    ];
+
+    const membersStatusCounts = await Members.aggregate(aggregation).exec();
+
+    // Define all possible statuses
+    const allStatuses = ["Active", "Inactive", "Abroad"];
+
+    // Ensure all statuses are included for each group, defaulting missing ones to zero
+    const data = membersStatusCounts.map((group) => {
+      const statusCounts = allStatuses.reduce((acc, status) => {
+        const foundStatus = group.statuses.find((s) => s.status === status);
+        acc[status] = foundStatus ? foundStatus.count : 0;
+        return acc;
+      }, {});
+
+      return {
+        groupName: group.groupName,
+        ...statusCounts,
+      };
+    });
+
+    res.json({ message: "Success", data });
+  } catch (error) {
+    console.error("Error fetching members data:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

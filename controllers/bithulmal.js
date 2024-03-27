@@ -7,6 +7,18 @@ const Membergroup = require("../models/membersGroup");
 // @access    protect
 exports.createBithulmal = async (req, res) => {
   try {
+    // Pre-process members data to set status based on amountPaid
+    if (req.body.members && Array.isArray(req.body.members)) {
+      req.body.members = req.body.members.map(member => {
+        if (member.amountPaid > 0 || (member.amountPaid !== "" && member.amountPaid != null)) {
+          member.status = 'Paid';
+        } else {
+          member.status = 'Unpaid';
+        }
+        return member;
+      });
+    }
+
     const newBithulmal = await Bithulmal.create(req.body);
     res.status(200).json({
       success: true,
@@ -17,7 +29,7 @@ exports.createBithulmal = async (req, res) => {
     console.log(err);
     res.status(400).json({
       success: false,
-      message: err,
+      message: err.message, // It's safer to send err.message instead of err directly
     });
   }
 };
@@ -176,8 +188,30 @@ exports.getBithulmals = async (req, res) => {
 // @access    protect
 exports.updateBithulmal = async (req, res) => {
   try {
-    const bithulmal = await Bithulmal.findByIdAndUpdate(req.body.id, req.body, {
-      new: true,
+    // Pre-process members data to set status based on amountPaid, if members data is provided in the request
+    if (req.body.members && Array.isArray(req.body.members)) {
+      req.body.members = req.body.members.map(member => {
+        if (member.amountPaid > 0 || (member.amountPaid !== "" && member.amountPaid != null)) {
+          member.status = 'Paid';
+        } else {
+          member.status = 'Unpaid';
+        }
+        return member;
+      });
+    }
+
+    // Assuming req.body.id contains the ID of the document to update. 
+    // If your client sends the ID differently, adjust accordingly.
+    const bithulmalId = req.body.id;
+    if (!bithulmalId) {
+      return res.status(400).json({
+        success: false,
+        message: "No Bithulmal ID provided",
+      });
+    }
+
+    const bithulmal = await Bithulmal.findByIdAndUpdate(bithulmalId, req.body, {
+      new: true, // Return the updated document
     });
 
     if (!bithulmal) {
@@ -193,10 +227,10 @@ exports.updateBithulmal = async (req, res) => {
       data: bithulmal,
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(400).json({
       success: false,
-      message: err,
+      message: err.message, // It's safer to send err.message instead of err directly
     });
   }
 };
