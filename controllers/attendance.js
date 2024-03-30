@@ -32,7 +32,7 @@ exports.getAttendances = async (req, res) => {
     if (id && mongoose.isValidObjectId(id)) {
       const attendance = await Attendance.findById(id)
         .populate("group")
-        .populate("member");
+        .populate("members.member");
       return res.status(200).json({
         success: true,
         message: "Retrieved specific attendance",
@@ -59,7 +59,7 @@ exports.getAttendances = async (req, res) => {
       parseInt(skip) === 0 && Attendance.countDocuments(query),
       Attendance.find(query)
         .populate("group")
-        .populate("member")
+        .populate("members.member")
         .skip(parseInt(skip) || 0)
         .limit(parseInt(limit) || 50)
         .sort({ _id: -1 }),

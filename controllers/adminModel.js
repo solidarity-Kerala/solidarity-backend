@@ -31,7 +31,8 @@ exports.getAdmin = async (req, res) => {
     const { id, skip, limit, searchkey } = req.query;
 
     if (id && mongoose.isValidObjectId(id)) {
-      const admin = await Admin.findById(id);
+      const admin = await Admin.findById(id).populate("group");
+
       return res.status(200).json({
         success: true,
         message: "Retrieved specific admin",
@@ -47,6 +48,7 @@ exports.getAdmin = async (req, res) => {
       parseInt(skip) === 0 && Admin.countDocuments(),
       parseInt(skip) === 0 && Admin.countDocuments(query),
       Admin.find(query)
+        .populate("group")
         .skip(parseInt(skip) || 0)
         .limit(parseInt(limit) || 50)
         .sort({ _id: -1 }),
