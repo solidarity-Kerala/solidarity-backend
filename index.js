@@ -67,6 +67,8 @@ const unit = require("./routes/unit.js");
 const download = require("./routes/download.js");
 const meeting = require("./routes/meeting.js");
 const about = require("./routes/about.js");
+const permissions = require("./routes/permissions.js");
+
 // mount routers
 app.use("/api/V1/auth", auth);
 app.use("/api/v1/user", user);
@@ -93,6 +95,7 @@ app.use("/api/v1/download", download);
 app.use("/api/v1/meeting", meeting);
 app.use("/api/v1/about", about);
 // app.use("/api/v1/present-absent-members-count",presentAbsentMembersByMonthwithcount):
+app.use("/api/v1/permissions", permissions);
 
 const PORT = process.env.PORT || 8085;
 app.listen(PORT, console.log(`port is running ${PORT}`));
