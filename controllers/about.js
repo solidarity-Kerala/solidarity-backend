@@ -72,11 +72,11 @@ exports.getAbouts = async (req, res) => {
 // @access    protect
 exports.updateAbout = async (req, res) => {
   try {
-    const About = await About.findByIdAndUpdate(req.body.id, req.body, {
+    const about = await About.findByIdAndUpdate(req.body.id, req.body, {
       new: true,
     });
 
-    if (!About) {
+    if (!about) {
       return res.status(404).json({
         success: false,
         message: "About not found",
@@ -86,7 +86,7 @@ exports.updateAbout = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "About updated successfully",
-      data: About,
+      data: about,
     });
   } catch (err) {
     console.log(err);

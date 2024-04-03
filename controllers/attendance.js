@@ -27,17 +27,49 @@ exports.createAttendance = async (req, res) => {
 // @access    public
 exports.getAttendances = async (req, res) => {
   try {
-    const { id, skip, limit, searchkey } = req.query;
+    const { id, skip, limit, searchkey, member } = req.query;
 
     if (id && mongoose.isValidObjectId(id)) {
       const attendance = await Attendance.findById(id)
         .populate("group")
-        .populate("member");
+        .populate("members.member");
       return res.status(200).json({
         success: true,
         message: "Retrieved specific attendance",
         response: attendance,
       });
+    }
+
+    if (member && mongoose.isValidObjectId(member)) {
+      const attendance = await Attendance.findById(member).populate("members.member");
+
+      // Check if member matches member of any attendance object
+      if (attendance) {
+        // Extract simplified members without attendance details
+        const simplifiedMembers = attendance.members.map(member => ({
+          _id: member.member._id,
+          name: member.member.name,
+          address: member.member.address,
+          mobileNumber: member.member.mobileNumber,
+          dob: member.member.dob,
+          memberStatus: member.member.memberStatus,
+        }));
+
+        // Return response with simplified members array
+        return res.status(200).json({
+          success: true,
+          message: "Retrieved all members corresponding to attendance",
+          response: simplifiedMembers,
+          count: simplifiedMembers.length,
+          totalCount: simplifiedMembers.length,
+          filterCount: simplifiedMembers.length
+        });
+      } else {
+        return res.status(404).json({
+          success: false,
+          message: "Attendance not found",
+        });
+      }
     }
 
     let query;
@@ -59,7 +91,7 @@ exports.getAttendances = async (req, res) => {
       parseInt(skip) === 0 && Attendance.countDocuments(query),
       Attendance.find(query)
         .populate("group")
-        .populate("member")
+        .populate("members.member")
         .skip(parseInt(skip) || 0)
         .limit(parseInt(limit) || 50)
         .sort({ _id: -1 }),

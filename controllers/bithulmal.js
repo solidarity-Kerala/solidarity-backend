@@ -123,7 +123,7 @@ exports.createBithulmal = async (req, res) => {
 
 exports.getBithulmals = async (req, res) => {
   try {
-    const { id, skip, limit, searchkey, group, monthCount } = req.query;
+    const { id, skip, limit, searchkey, group, monthCount, member } = req.query;
 
     if (id && mongoose.isValidObjectId(id)) {
       const response = await Bithulmal.findById(id)
@@ -134,6 +134,38 @@ exports.getBithulmals = async (req, res) => {
         message: "Retrieved specific Bithulmal",
         response,
       });
+    }
+
+    if (member && mongoose.isValidObjectId(member)) {
+      const bithulmal = await Bithulmal.findById(member).populate("members.member");
+
+      // Check if member matches member of any bithulmal object
+      if (bithulmal) {
+        // Extract simplified members without bithulmal details
+        const simplifiedMembers = bithulmal.members.map(member => ({
+          _id: member.member._id,
+          name: member.member.name,
+          address: member.member.address,
+          mobileNumber: member.member.mobileNumber,
+          dob: member.member.dob,
+          memberStatus: member.member.memberStatus,
+        }));
+
+        // Return response with simplified members array
+        return res.status(200).json({
+          success: true,
+          message: "Retrieved all members corresponding to bithulmal",
+          response: simplifiedMembers,
+          count: simplifiedMembers.length,
+          totalCount: simplifiedMembers.length,
+          filterCount: simplifiedMembers.length
+        });
+      } else {
+        return res.status(404).json({
+          success: false,
+          message: "Bithulmal not found",
+        });
+      }
     }
 
     let query = {};
