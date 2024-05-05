@@ -92,6 +92,8 @@ exports.getMeeting = async (req, res) => {
     if (monthCount && !isNaN(monthCount)) {
       const count = monthCount - 1;
       const end = new Date(); // Today's date for reference
+      end.setMonth(end.getMonth() + 1); // Move to next month
+      end.setDate(0); // Set to last day of the current month
       const start = new Date(
         new Date().setMonth(end.getMonth() - parseInt(count))
       );
@@ -108,6 +110,8 @@ exports.getMeeting = async (req, res) => {
       query.date = { $gte: start, $lt: end }; // Meetings within the start to end date range
     }
 
+    console.log({ query });
+    
     const [totalCount, filterCount, data] = await Promise.all([
       parseInt(skip) === 0 && Meeting.countDocuments(),
       parseInt(skip) === 0 && Meeting.countDocuments(query),
