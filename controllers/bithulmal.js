@@ -9,14 +9,13 @@ exports.createBithulmal = async (req, res) => {
   try {
     // Pre-process members data to set status based on amountPaid
     if (req.body.members && Array.isArray(req.body.members)) {
-      req.body.members = req.body.members.map((member) => {
-        if (member.amountPaid === "0") {
-          // Use strict equality here
-          member.status = "Unpaid";
+      req.body.members = req.body.members.map(member => {
+        if (member.amountPaid === "0") { // Use strict equality here
+          member.status = 'Unpaid';
         } else if (member.amountPaid > 0 || member.amountPaid !== "") {
-          member.status = "Paid";
+          member.status = 'Paid';
         } else {
-          member.status = "Unpaid";
+          member.status = 'Unpaid';
         }
         return member;
       });
@@ -36,6 +35,7 @@ exports.createBithulmal = async (req, res) => {
     });
   }
 };
+
 
 // @desc      GET ALL BITHULMALS
 // @route     GET /api/v1/bithulmals
@@ -140,14 +140,12 @@ exports.getBithulmals = async (req, res) => {
     }
 
     if (member && mongoose.isValidObjectId(member)) {
-      const bithulmal = await Bithulmal.findById(member).populate(
-        "members.member"
-      );
+      const bithulmal = await Bithulmal.findById(member).populate("members.member");
 
       // Check if member matches member of any bithulmal object
       if (bithulmal) {
         // Extract simplified members without bithulmal details
-        const simplifiedMembers = bithulmal.members.map((member) => ({
+        const simplifiedMembers = bithulmal.members.map(member => ({
           _id: member.member._id,
           name: member.member.name,
           address: member.member.address,
@@ -163,7 +161,7 @@ exports.getBithulmals = async (req, res) => {
           response: simplifiedMembers,
           count: simplifiedMembers.length,
           totalCount: simplifiedMembers.length,
-          filterCount: simplifiedMembers.length,
+          filterCount: simplifiedMembers.length
         });
       } else {
         return res.status(404).json({
@@ -181,19 +179,13 @@ exports.getBithulmals = async (req, res) => {
       query.month = { $regex: searchkey, $options: "i" }; // Add search by month
     }
 
+
     // Adjust query based on monthCount
     if (monthCount && !isNaN(monthCount)) {
       const count = monthCount - 1;
       const today = new Date();
       const start = new Date(today.getFullYear(), today.getMonth() - count, 1);
-      const end = new Date(
-        today.getFullYear(),
-        today.getMonth() + 1,
-        0,
-        23,
-        59,
-        59
-      );
+      const end = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59);
 
       query.date = { $gte: start, $lte: end };
     }
@@ -233,20 +225,19 @@ exports.updateBithulmal = async (req, res) => {
   try {
     // Pre-process members data to set status based on amountPaid, if members data is provided in the request
     if (req.body.members && Array.isArray(req.body.members)) {
-      req.body.members = req.body.members.map((member) => {
-        if (member.amountPaid === "0") {
-          // Use strict equality here
-          member.status = "Unpaid";
+      req.body.members = req.body.members.map(member => {
+        if (member.amountPaid === "0") { // Use strict equality here
+          member.status = 'Unpaid';
         } else if (member.amountPaid > 0 || member.amountPaid !== "") {
-          member.status = "Paid";
+          member.status = 'Paid';
         } else {
-          member.status = "Unpaid";
+          member.status = 'Unpaid';
         }
         return member;
       });
     }
 
-    // Assuming req.body.id contains the ID of the document to update.
+    // Assuming req.body.id contains the ID of the document to update. 
     // If your client sends the ID differently, adjust accordingly.
     const bithulmalId = req.body.id;
     if (!bithulmalId) {
@@ -281,6 +272,7 @@ exports.updateBithulmal = async (req, res) => {
   }
 };
 
+
 // @desc      DELETE SPECIFIC BITHULMAL
 // @route     DELETE /api/v1/bithulmals/:id
 // @access    protect
@@ -313,10 +305,7 @@ exports.getMemberBithulmal = async (req, res) => {
     const { groupId, memberId } = req.query;
 
     // Validate group and member IDs
-    if (
-      !mongoose.isValidObjectId(groupId) ||
-      !mongoose.isValidObjectId(memberId)
-    ) {
+    if (!mongoose.isValidObjectId(groupId) || !mongoose.isValidObjectId(memberId)) {
       return res.status(400).json({
         success: false,
         message: "Invalid group or member ID",
@@ -333,12 +322,8 @@ exports.getMemberBithulmal = async (req, res) => {
     const formattedResponse = bithulmalData.map((bithulmal) => ({
       month: bithulmal.month,
       date: bithulmal.date,
-      status: bithulmal.members.find(
-        (member) => member.member.toString() === memberId
-      ).status,
-      amountPaid: bithulmal.members.find(
-        (member) => member.member.toString() === memberId
-      ).amountPaid,
+      status: bithulmal.members.find((member) => member.member.toString() === memberId).status,
+      amountPaid: bithulmal.members.find((member) => member.member.toString() === memberId).amountPaid,
     }));
 
     res.status(200).json({
@@ -534,14 +519,12 @@ exports.getBithulmalByMemberGroupId = async (req, res) => {
     const group = req.query.group; // Assuming group is passed as a property in the request body
 
     // Find Bithulmals with the given group
-    const bithulmals = await Bithulmal.find({ group: group })
-      .populate("member")
-      .populate("group");
+    const bithulmals = await Bithulmal.find({ group: group }).populate('member').populate('group');
 
     if (!bithulmals || bithulmals.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "No Bithulmals found for the provided group",
+        message: 'No Bithulmals found for the provided group',
       });
     }
 
