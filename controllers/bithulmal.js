@@ -226,12 +226,10 @@ exports.updateBithulmal = async (req, res) => {
     // Pre-process members data to set status based on amountPaid, if members data is provided in the request
     if (req.body.members && Array.isArray(req.body.members)) {
       req.body.members = req.body.members.map(member => {
-        if (member.amountPaid === "0") { // Use strict equality here
+        if (member.amountPaid === "0" || parseFloat(member.amountPaid) === 0) { // Check if amountPaid is "0" or 0
           member.status = 'Unpaid';
-        } else if (member.amountPaid > 0 || member.amountPaid !== "") {
-          member.status = 'Paid';
         } else {
-          member.status = 'Unpaid';
+          member.status = 'Paid';
         }
         return member;
       });
