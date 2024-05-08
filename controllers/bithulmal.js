@@ -151,7 +151,8 @@ exports.getBithulmals = async (req, res) => {
           address: member.member.address,
           mobileNumber: member.member.mobileNumber,
           dob: member.member.dob,
-          memberStatus: member.member.memberStatus,
+          memberStatus: member.status,
+          amountPaid: member.amountPaid,
         }));
 
         // Return response with simplified members array
