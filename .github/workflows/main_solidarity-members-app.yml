@@ -40,3 +40,7 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/solidarity-backend:latest
+      # step 5: depolyment
+      - name: Trigger deployment endpoint
+        run: |
+          curl -X POST http://20.235.203.243/ -H "Content-Type: application/json" -d '{"dir": "solidarity-backend"}'
