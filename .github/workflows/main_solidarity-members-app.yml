@@ -34,12 +34,16 @@ jobs:
           azPSVersion: "latest"
           inlineScript: |
             Connect-AzContainerRegistry -Name datahexrepository
+      # set short sha
+      - name: Set outputs
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       # step 4: docker build and push
       - name: docker build and push
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/solidarity-backend:latest
+          tags: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/solidarity-backend:latest, ${{ secrets.AZURE_CONTAINER_REGISTRY }}/solidarity-backend:${{ steps.vars.outputs.sha_short }}
       # step 5: depolyment
       - name: Trigger deployment endpoint
         run: |
