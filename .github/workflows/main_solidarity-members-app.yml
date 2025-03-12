@@ -20,7 +20,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: 'migration-branch'
+          ref: 'main'
       # step 2: login into azure using powershell
       - name: Login via Az module
         uses: azure/login@v2
