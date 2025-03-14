@@ -14,6 +14,7 @@ const allowedOrigins = [
   "https://gentle-forest-0ff497700.3.azurestaticapps.net",
   "https://solidarity-cms-szb9l.ondigitalocean.app",
   "https://solidarity-cms-new-f9x8i.ondigitalocean.app",
+  "https://app.solidarityym.org",
 ];
 
 //cors policy
