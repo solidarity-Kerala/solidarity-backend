@@ -1,33 +1,50 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy Node.js app to Azure Web App - solidarity
-
+name: solidarity-backend
+#trigger branch
 on:
   push:
     branches:
       - main
+      - migration-branch
   workflow_dispatch:
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18.x'
+permissions:
+  id-token: write #Require write permission to Fetch an OIDC token.
+  contents: read
 
-      - name: Install Dependencies
-        run: |
-          npm install
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          app-name: 'solidarity-Members-App'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_01A0665698DE4D8A81E51C85F49894C3 }}
-          package: .
+          ref: 'main'
+      # step 2: login into azure using powershell
+      - name: Login via Az module
+        uses: azure/login@v2
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}}
+          enable-AzPSSession: true
+      # step 3: docker login
+      - name: docker login
+        uses: azure/powershell@v2
+        with:
+          azPSVersion: "latest"
+          inlineScript: |
+            Connect-AzContainerRegistry -Name datahexrepository
+      # set short sha
+      - name: Set outputs
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      # step 4: docker build and push
+      - name: docker build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/solidarity-backend:latest, ${{ secrets.AZURE_CONTAINER_REGISTRY }}/solidarity-backend:${{ steps.vars.outputs.sha_short }}
+      # step 5: depolyment
+      - name: Trigger deployment endpoint
+        run: |
+          curl -X POST http://20.235.203.243/ -H "Content-Type: application/json" -d '{"dir": "solidarity-backend"}'
